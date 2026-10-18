@@ -31,7 +31,7 @@ const NAV_SECTIONS = [
   }
 ];
 
-export default function Sidebar({ activePage, setActivePage, mobileOpen, onCloseMobile }) {
+export default function Sidebar({ activePage, setActivePage, mobileOpen, onCloseMobile, theme = 'dark', toggleTheme }) {
   return (
     <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
       {/* Brand Header */}

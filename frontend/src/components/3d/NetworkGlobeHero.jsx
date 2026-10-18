@@ -4,6 +4,7 @@ import { OrbitControls, Html, Float } from '@react-three/drei';
 import * as THREE from 'three';
 import { RotateCcw, Play, Pause, Layers, ShieldAlert, CheckCircle2, X } from 'lucide-react';
 import WebGLFallback from './WebGLFallback';
+import ErrorBoundary from '../ErrorBoundary';
 
 // Verified real dataset node profiles
 const DATASET_NODES = [
@@ -246,25 +247,27 @@ function InteractiveNode({ node, isSelected, onSelect, theme = 'dark' }) {
       )}
 
       {/* HTML Label on 3D Node */}
-      <Html distanceFactor={8} position={[0, node.radius + 0.14, 0]} center>
+      <Html distanceFactor={12} position={[0, node.radius + 0.16, 0]} center>
         <div style={{
           background: isSelected 
             ? (theme === 'light' ? '#ffffff' : 'rgba(8, 11, 16, 0.95)') 
             : (theme === 'light' ? 'rgba(255, 255, 255, 0.92)' : 'rgba(12, 17, 24, 0.85)'),
-          border: `1px solid ${isSelected ? node.color : (theme === 'light' ? 'rgba(15, 23, 42, 0.15)' : 'rgba(148, 163, 184, 0.15)')}`,
-          padding: '3px 8px',
+          border: `1px solid ${isSelected ? node.color : (theme === 'light' ? 'rgba(15, 23, 42, 0.2)' : 'rgba(148, 163, 184, 0.2)')}`,
+          padding: '2px 6px',
           borderRadius: '4px',
-          fontSize: '11px',
-          fontFamily: 'monospace',
+          fontSize: '9.5px',
+          fontWeight: 600,
+          fontFamily: 'system-ui, -apple-system, sans-serif',
           color: theme === 'light' ? '#0f172a' : '#f1f5f9',
           whiteSpace: 'nowrap',
           pointerEvents: 'none',
+          userSelect: 'none',
           boxShadow: isSelected 
-            ? `0 2px 12px ${node.color}50` 
+            ? `0 2px 12px ${node.color}60` 
             : (theme === 'light' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none'),
           transition: 'all 0.2s ease'
         }}>
-          {node.label} <span style={{ color: node.color, fontWeight: 'bold' }}>{node.percentage}%</span>
+          {node.label} <span style={{ color: node.color, fontWeight: 700 }}>{node.percentage}%</span>
         </div>
       </Html>
     </group>
@@ -273,7 +276,7 @@ function InteractiveNode({ node, isSelected, onSelect, theme = 'dark' }) {
 
 // Spline Transmission Arc between Two Nodes
 function TransmissionArc({ start, end, color = '#22d3ee', theme = 'dark' }) {
-  const lineObj = useMemo(() => {
+  const line = useMemo(() => {
     const v1 = new THREE.Vector3(...start);
     const v2 = new THREE.Vector3(...end);
     const mid = new THREE.Vector3().addVectors(v1, v2).multiplyScalar(0.5);
@@ -281,14 +284,15 @@ function TransmissionArc({ start, end, color = '#22d3ee', theme = 'dark' }) {
     const curve = new THREE.QuadraticBezierCurve3(v1, mid, v2);
     const points = curve.getPoints(32);
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    return geometry;
-  }, [start, end]);
+    const material = new THREE.LineBasicMaterial({
+      color,
+      transparent: true,
+      opacity: theme === 'light' ? 0.45 : 0.28
+    });
+    return new THREE.Line(geometry, material);
+  }, [start, end, color, theme]);
 
-  return (
-    <line geometry={lineObj}>
-      <lineBasicMaterial color={color} transparent opacity={theme === 'light' ? 0.4 : 0.25} />
-    </line>
-  );
+  return <primitive object={line} />;
 }
 
 // Main Network Globe 3D Scene
@@ -296,6 +300,7 @@ export default function NetworkGlobeHero({ overviewData, theme = 'dark' }) {
   const [selectedNode, setSelectedNode] = useState(DATASET_NODES[0]); // Default to DOS_SYN_Hping
   const [isRotating, setIsRotating] = useState(true);
   const [hasWebGL, setHasWebGL] = useState(true);
+  const [viewMode, setViewMode] = useState('3D'); // '3D' | '2D'
   const controlsRef = useRef();
 
   useEffect(() => {
@@ -303,9 +308,13 @@ export default function NetworkGlobeHero({ overviewData, theme = 'dark' }) {
     try {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      if (!gl) setHasWebGL(false);
+      if (!gl) {
+        setHasWebGL(false);
+        setViewMode('2D');
+      }
     } catch (e) {
       setHasWebGL(false);
+      setViewMode('2D');
     }
   }, []);
 
@@ -315,99 +324,134 @@ export default function NetworkGlobeHero({ overviewData, theme = 'dark' }) {
     }
   };
 
-  if (!hasWebGL) {
-    return (
-      <div className="hero-3d-card">
-        <div className="hero-3d-header">
-          <div className="hero-3d-title-group">
-            <span className="hero-3d-badge">2D Topology View</span>
-            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-              RT-IOT2022 Network Interaction Model
-            </span>
-          </div>
-        </div>
-        <div className="hero-3d-canvas-wrap">
-          <WebGLFallback onSelectNode={setSelectedNode} selectedNode={selectedNode} />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="hero-3d-card">
       {/* Header Bar */}
       <div className="hero-3d-header">
         <div className="hero-3d-title-group">
-          <span className="hero-3d-badge">3D Network Intelligence</span>
+          <span className="hero-3d-badge">{viewMode === '3D' ? '3D Network Intelligence' : '2D Topology View'}</span>
           <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
             Spatial Traffic Topology & Threat Clustering (123,117 Flows)
           </span>
         </div>
-        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-emerald)', display: 'inline-block' }} />
-          Hardware Accelerated WebGL
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* 3D / 2D Mode Switcher */}
+          <div style={{ 
+            display: 'inline-flex', 
+            background: theme === 'light' ? 'rgba(226, 232, 240, 0.6)' : 'rgba(15, 23, 42, 0.6)', 
+            padding: 2, 
+            borderRadius: 6, 
+            border: '1px solid var(--border-subtle)' 
+          }}>
+            <button
+              onClick={() => setViewMode('3D')}
+              style={{
+                padding: '3px 9px',
+                fontSize: '0.72rem',
+                borderRadius: 4,
+                border: 'none',
+                cursor: 'pointer',
+                background: viewMode === '3D' ? 'var(--accent-cyan-subtle)' : 'transparent',
+                color: viewMode === '3D' ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                fontWeight: viewMode === '3D' ? 700 : 500,
+                transition: 'all 0.15s ease'
+              }}
+            >
+              3D Spatial
+            </button>
+            <button
+              onClick={() => setViewMode('2D')}
+              style={{
+                padding: '3px 9px',
+                fontSize: '0.72rem',
+                borderRadius: 4,
+                border: 'none',
+                cursor: 'pointer',
+                background: viewMode === '2D' ? 'var(--accent-cyan-subtle)' : 'transparent',
+                color: viewMode === '2D' ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                fontWeight: viewMode === '2D' ? 700 : 500,
+                transition: 'all 0.15s ease'
+              }}
+            >
+              2D Topology
+            </button>
+          </div>
+
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-emerald)', display: 'inline-block' }} />
+            {viewMode === '3D' ? 'WebGL 3D Active' : 'SVG Vector Map'}
+          </div>
         </div>
       </div>
 
-      {/* 3D Canvas Viewport */}
+      {/* Canvas / Vector Viewport */}
       <div className="hero-3d-canvas-wrap">
-        <Canvas
-          camera={{ position: [0, 0.8, 5.0], fov: 46 }}
-          dpr={[1, Math.min(window.devicePixelRatio, 2)]}
-          gl={{ antialias: true, alpha: true }}
-        >
-          <ambientLight intensity={theme === 'light' ? 0.75 : 0.4} />
-          <pointLight position={[10, 10, 10]} intensity={theme === 'light' ? 1.0 : 0.8} color="#22d3ee" />
-          <pointLight position={[-10, -10, -10]} intensity={theme === 'light' ? 0.6 : 0.4} color="#34d399" />
+        {viewMode === '2D' || !hasWebGL ? (
+          <WebGLFallback onSelectNode={setSelectedNode} selectedNode={selectedNode} />
+        ) : (
+          <ErrorBoundary fallback={<WebGLFallback onSelectNode={setSelectedNode} selectedNode={selectedNode} />}>
+            <Canvas
+              camera={{ position: [0, 0.8, 5.0], fov: 46 }}
+              dpr={[1, Math.min(window.devicePixelRatio, 2)]}
+              gl={{ antialias: true, alpha: true }}
+            >
+              <ambientLight intensity={theme === 'light' ? 0.75 : 0.4} />
+              <pointLight position={[10, 10, 10]} intensity={theme === 'light' ? 1.0 : 0.8} color="#22d3ee" />
+              <pointLight position={[-10, -10, -10]} intensity={theme === 'light' ? 0.6 : 0.4} color="#34d399" />
 
-          <Suspense fallback={null}>
-            <GlobeLattice theme={theme} />
-            <FloatingParticles count={140} theme={theme} />
+              <Suspense fallback={null}>
+                <GlobeLattice theme={theme} />
+                <FloatingParticles count={140} theme={theme} />
 
-            {/* Transmission Arcs */}
-            <TransmissionArc start={DATASET_NODES[0].pos} end={DATASET_NODES[1].pos} color="#34d399" theme={theme} />
-            <TransmissionArc start={DATASET_NODES[0].pos} end={DATASET_NODES[3].pos} color="#10b981" theme={theme} />
-            <TransmissionArc start={DATASET_NODES[2].pos} end={DATASET_NODES[0].pos} color="#f59e0b" theme={theme} />
-            <TransmissionArc start={DATASET_NODES[4].pos} end={DATASET_NODES[1].pos} color="#22d3ee" theme={theme} />
+                {/* Transmission Arcs */}
+                <TransmissionArc start={DATASET_NODES[0].pos} end={DATASET_NODES[1].pos} color="#34d399" theme={theme} />
+                <TransmissionArc start={DATASET_NODES[0].pos} end={DATASET_NODES[3].pos} color="#10b981" theme={theme} />
+                <TransmissionArc start={DATASET_NODES[2].pos} end={DATASET_NODES[0].pos} color="#f59e0b" theme={theme} />
+                <TransmissionArc start={DATASET_NODES[4].pos} end={DATASET_NODES[1].pos} color="#22d3ee" theme={theme} />
 
-            {/* Dataset Nodes */}
-            {DATASET_NODES.map((node) => (
-              <InteractiveNode
-                key={node.id}
-                node={node}
-                isSelected={selectedNode?.id === node.id}
-                onSelect={(n) => setSelectedNode(n)}
-                theme={theme}
+                {/* Dataset Nodes */}
+                {DATASET_NODES.map((node) => (
+                  <InteractiveNode
+                    key={node.id}
+                    node={node}
+                    isSelected={selectedNode?.id === node.id}
+                    onSelect={(n) => setSelectedNode(n)}
+                    theme={theme}
+                  />
+                ))}
+              </Suspense>
+
+              <OrbitControls
+                ref={controlsRef}
+                enablePan={false}
+                minDistance={3.5}
+                maxDistance={8}
+                dampingFactor={0.06}
+                autoRotate={isRotating}
+                autoRotateSpeed={0.7}
               />
-            ))}
-          </Suspense>
+            </Canvas>
+          </ErrorBoundary>
+        )}
 
-          <OrbitControls
-            ref={controlsRef}
-            enablePan={false}
-            minDistance={3.5}
-            maxDistance={8}
-            dampingFactor={0.06}
-            autoRotate={isRotating}
-            autoRotateSpeed={0.7}
-          />
-        </Canvas>
-
-        {/* Floating Scene Controls */}
-        <div className="hero-3d-controls">
-          <button
-            className="hero-btn"
-            onClick={() => setIsRotating(!isRotating)}
-            title={isRotating ? 'Pause Rotation' : 'Resume Rotation'}
-          >
-            {isRotating ? <Pause size={14} /> : <Play size={14} />}
-            <span>{isRotating ? 'Pause' : 'Rotate'}</span>
-          </button>
-          <button className="hero-btn" onClick={handleResetView} title="Reset Camera">
-            <RotateCcw size={14} />
-            <span>Reset View</span>
-          </button>
-        </div>
+        {/* Floating Scene Controls (3D Mode) */}
+        {viewMode === '3D' && hasWebGL && (
+          <div className="hero-3d-controls">
+            <button
+              className="hero-btn"
+              onClick={() => setIsRotating(!isRotating)}
+              title={isRotating ? 'Pause Rotation' : 'Resume Rotation'}
+            >
+              {isRotating ? <Pause size={14} /> : <Play size={14} />}
+              <span>{isRotating ? 'Pause' : 'Rotate'}</span>
+            </button>
+            <button className="hero-btn" onClick={handleResetView} title="Reset Camera">
+              <RotateCcw size={14} />
+              <span>Reset View</span>
+            </button>
+          </div>
+        )}
 
         {/* Selected Node Real Data Inspection Drawer */}
         {selectedNode && (

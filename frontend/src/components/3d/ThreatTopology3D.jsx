@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { Shield, ShieldAlert, CheckCircle2, RotateCcw, Filter } from 'lucide-react';
+import ErrorBoundary from '../ErrorBoundary';
 
 const THREAT_NODES = [
   { id: 'DOS_SYN_Hping', label: 'DOS_SYN_Hping', x: 2.2, y: 0.5, z: 0.2, r: 0.25, color: '#f43f5e', proto: 'TCP', count: 94089, isNormal: false },
@@ -37,16 +38,18 @@ function HubNode({ hub, theme = 'dark' }) {
           wireframe
         />
       </mesh>
-      <Html distanceFactor={9} position={[0, hub.radius + 0.15, 0]} center>
+      <Html distanceFactor={12} position={[0, hub.radius + 0.15, 0]} center>
         <div style={{
-          background: theme === 'light' ? 'rgba(255, 255, 255, 0.92)' : 'rgba(8, 11, 16, 0.85)',
+          background: theme === 'light' ? 'rgba(255, 255, 255, 0.94)' : 'rgba(8, 11, 16, 0.88)',
           border: `1px solid ${hub.color}`,
           color: theme === 'light' ? '#0f172a' : hub.color,
           padding: '2px 6px',
           borderRadius: 4,
-          fontSize: '10px',
-          fontWeight: 'bold',
+          fontSize: '9.5px',
+          fontWeight: 700,
+          fontFamily: 'system-ui, -apple-system, sans-serif',
           whiteSpace: 'nowrap',
+          userSelect: 'none',
           boxShadow: theme === 'light' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none'
         }}>
           {hub.label}
@@ -94,19 +97,21 @@ function ThreatSphere({ node, isSelected, onSelect, theme = 'dark' }) {
         />
       </mesh>
 
-      <Html distanceFactor={8} position={[0, node.r + 0.12, 0]} center>
+      <Html distanceFactor={12} position={[0, node.r + 0.14, 0]} center>
         <div style={{
           background: isSelected 
             ? (theme === 'light' ? '#ffffff' : 'rgba(8, 11, 16, 0.95)') 
             : (theme === 'light' ? 'rgba(255, 255, 255, 0.92)' : 'rgba(12, 17, 24, 0.85)'),
-          border: `1px solid ${isSelected ? node.color : (theme === 'light' ? 'rgba(15, 23, 42, 0.15)' : 'rgba(148, 163, 184, 0.2)')}`,
+          border: `1px solid ${isSelected ? node.color : (theme === 'light' ? 'rgba(15, 23, 42, 0.2)' : 'rgba(148, 163, 184, 0.2)')}`,
           color: theme === 'light' ? '#0f172a' : '#f1f5f9',
           padding: '2px 6px',
           borderRadius: 4,
-          fontSize: '10px',
-          fontFamily: 'monospace',
+          fontSize: '9.5px',
+          fontWeight: 600,
+          fontFamily: 'system-ui, -apple-system, sans-serif',
           whiteSpace: 'nowrap',
           pointerEvents: 'none',
+          userSelect: 'none',
           boxShadow: isSelected 
             ? `0 2px 10px ${node.color}50` 
             : (theme === 'light' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none')
@@ -121,14 +126,16 @@ function ThreatSphere({ node, isSelected, onSelect, theme = 'dark' }) {
 function ConnectionLine({ start, end, color, theme = 'dark' }) {
   const line = useMemo(() => {
     const points = [new THREE.Vector3(...start), new THREE.Vector3(...end)];
-    return new THREE.BufferGeometry().setFromPoints(points);
-  }, [start, end]);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({
+      color,
+      transparent: true,
+      opacity: theme === 'light' ? 0.35 : 0.2
+    });
+    return new THREE.Line(geometry, material);
+  }, [start, end, color, theme]);
 
-  return (
-    <line geometry={line}>
-      <lineBasicMaterial color={color} transparent opacity={theme === 'light' ? 0.35 : 0.2} />
-    </line>
-  );
+  return <primitive object={line} />;
 }
 
 export default function ThreatTopology3D({ selectedThreat, onSelectThreat, theme = 'dark' }) {
@@ -193,53 +200,55 @@ export default function ThreatTopology3D({ selectedThreat, onSelectThreat, theme
           ? 'radial-gradient(circle at 50% 50%, #edf2f7 0%, #f1f5f9 80%)' 
           : 'radial-gradient(circle at 50% 50%, #0d1521 0%, #080b10 80%)' 
       }}>
-        <Canvas camera={{ position: [0, 1.0, 5.2], fov: 45 }}>
-          <ambientLight intensity={theme === 'light' ? 0.75 : 0.4} />
-          <pointLight position={[8, 8, 8]} intensity={theme === 'light' ? 0.9 : 0.7} color="#22d3ee" />
-          <pointLight position={[-8, -8, -8]} intensity={theme === 'light' ? 0.6 : 0.4} color="#f43f5e" />
+        <ErrorBoundary fallback={<div style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>3D Constellation Viewport (Hardware WebGL Fallback Active)</div>}>
+          <Canvas camera={{ position: [0, 1.0, 5.2], fov: 45 }}>
+            <ambientLight intensity={theme === 'light' ? 0.75 : 0.4} />
+            <pointLight position={[8, 8, 8]} intensity={theme === 'light' ? 0.9 : 0.7} color="#22d3ee" />
+            <pointLight position={[-8, -8, -8]} intensity={theme === 'light' ? 0.6 : 0.4} color="#f43f5e" />
 
-          <Suspense fallback={null}>
-            {/* Core Hubs */}
-            {HUBS.map((hub) => (
-              <HubNode key={hub.id} hub={hub} theme={theme} />
-            ))}
+            <Suspense fallback={null}>
+              {/* Core Hubs */}
+              {HUBS.map((hub) => (
+                <HubNode key={hub.id} hub={hub} theme={theme} />
+              ))}
 
-            {/* Connecting lines between hubs and nodes */}
-            {filteredNodes.map((node) => {
-              const targetHub = node.proto === 'UDP' ? HUBS[1] : HUBS[0];
-              return (
-                <ConnectionLine
-                  key={`line-${node.id}`}
-                  start={[node.x, node.y, node.z]}
-                  end={targetHub.pos}
-                  color={node.color}
+              {/* Connecting lines between hubs and nodes */}
+              {filteredNodes.map((node) => {
+                const targetHub = node.proto === 'UDP' ? HUBS[1] : HUBS[0];
+                return (
+                  <ConnectionLine
+                    key={`line-${node.id}`}
+                    start={[node.x, node.y, node.z]}
+                    end={targetHub.pos}
+                    color={node.color}
+                    theme={theme}
+                  />
+                );
+              })}
+
+              {/* Threat Nodes */}
+              {filteredNodes.map((node) => (
+                <ThreatSphere
+                  key={node.id}
+                  node={node}
+                  isSelected={selectedThreat?.id === node.id}
+                  onSelect={(n) => onSelectThreat && onSelectThreat(n)}
                   theme={theme}
                 />
-              );
-            })}
+              ))}
+            </Suspense>
 
-            {/* Threat Nodes */}
-            {filteredNodes.map((node) => (
-              <ThreatSphere
-                key={node.id}
-                node={node}
-                isSelected={selectedThreat?.id === node.id}
-                onSelect={(n) => onSelectThreat && onSelectThreat(n)}
-                theme={theme}
-              />
-            ))}
-          </Suspense>
-
-          <OrbitControls
-            ref={controlsRef}
-            enablePan={false}
-            minDistance={3.2}
-            maxDistance={7.5}
-            dampingFactor={0.06}
-            autoRotate
-            autoRotateSpeed={0.5}
-          />
-        </Canvas>
+            <OrbitControls
+              ref={controlsRef}
+              enablePan={false}
+              minDistance={3.2}
+              maxDistance={7.5}
+              dampingFactor={0.06}
+              autoRotate
+              autoRotateSpeed={0.5}
+            />
+          </Canvas>
+        </ErrorBoundary>
 
         <div style={{
           position: 'absolute',

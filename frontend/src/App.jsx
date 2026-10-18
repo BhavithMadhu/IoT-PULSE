@@ -10,6 +10,8 @@ import MachineLearningPage from './pages/MachineLearningPage';
 import DataExplorerPage from './pages/DataExplorerPage';
 import MethodologyPage from './pages/MethodologyPage';
 
+import ErrorBoundary from './components/ErrorBoundary';
+
 const PAGE_TITLES = {
   overview: 'Executive Cybersecurity Overview',
   attacks: 'Attack Intelligence & Spatial Threat Taxonomy',
@@ -78,7 +80,9 @@ export default function App() {
           toggleTheme={toggleTheme}
         />
         <main>
-          {renderPage()}
+          <ErrorBoundary title="IoT PULSE Analytics Module">
+            {renderPage()}
+          </ErrorBoundary>
         </main>
       </div>
     </div>
