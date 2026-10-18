@@ -1,0 +1,13 @@
+attack_type,record_count,percentage,is_normal
+DOS_SYN_Hping,94659,76.885,False
+Thing_Speak,8108,6.586,True
+ARP_poisioning,7750,6.295,False
+MQTT_Publish,4146,3.368,True
+NMAP_UDP_SCAN,2590,2.104,False
+NMAP_XMAS_TREE_SCAN,2010,1.633,False
+NMAP_OS_DETECTION,2000,1.624,False
+NMAP_TCP_scan,1002,0.814,False
+DDOS_Slowloris,534,0.434,False
+Wipro_bulb,253,0.205,True
+Metasploit_Brute_Force_SSH,37,0.03,False
+NMAP_FIN_SCAN,28,0.023,False

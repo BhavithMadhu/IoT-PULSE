@@ -1,0 +1,4 @@
+proto,record_count,percentage
+tcp,110427,89.693
+udp,12633,10.261
+icmp,57,0.046

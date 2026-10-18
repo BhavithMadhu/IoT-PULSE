@@ -1,0 +1,11 @@
+service,record_count,percentage
+-,102861,83.547
+dns,9753,7.922
+mqtt,4132,3.356
+http,3464,2.814
+ssl,2663,2.163
+ntp,121,0.098
+dhcp,50,0.041
+irc,43,0.035
+ssh,28,0.023
+radius,2,0.002

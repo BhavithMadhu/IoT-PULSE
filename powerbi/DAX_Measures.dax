@@ -1,0 +1,172 @@
+/*
+========================================================================================
+IoT PULSE — Power BI DAX Measures Library
+Enterprise calculations across 5 dashboard pages
+========================================================================================
+*/
+
+// =====================================================================================
+// PAGE 1: EXECUTIVE OVERVIEW MEASURES
+// =====================================================================================
+
+// Total Network Flow Records
+Total_Flow_Records = 
+    IF(
+        ISBLANK(COUNTROWS(Flows)), 
+        SUM(AttackDistribution[Record_Count]), 
+        COUNTROWS(Flows)
+    )
+
+// Distinct Attack Labels Count
+Distinct_Attack_Labels = 
+    DISTINCTCOUNT(AttackDistribution[Attack_Type])
+
+// Normal IoT Device Telemetry Flows (Thing_Speak, MQTT_Publish, Wipro_bulb)
+Normal_Flows_Count = 
+    CALCULATE(
+        SUM(AttackDistribution[Record_Count]),
+        AttackDistribution[Is_Normal] = TRUE()
+    )
+
+// Normal IoT Traffic Percentage
+Normal_Traffic_Share_Pct = 
+    DIVIDE([Normal_Flows_Count], [Total_Flow_Records], 0) * 100
+
+// Malicious Attack Flows Count
+Malicious_Flows_Count = 
+    CALCULATE(
+        SUM(AttackDistribution[Record_Count]),
+        AttackDistribution[Is_Normal] = FALSE()
+    )
+
+// Malicious Attack Traffic Percentage
+Malicious_Traffic_Share_Pct = 
+    DIVIDE([Malicious_Flows_Count], [Total_Flow_Records], 0) * 100
+
+// Majority Attack Label Name
+Majority_Attack_Label = 
+    CALCULATE(
+        SELECTEDVALUE(AttackDistribution[Attack_Type]),
+        TOPN(1, ALL(AttackDistribution), AttackDistribution[Record_Count], DESC)
+    )
+
+// Majority Attack Class Share Percentage
+Majority_Attack_Share_Pct = 
+    CALCULATE(
+        MAX(AttackDistribution[Percentage]),
+        TOPN(1, ALL(AttackDistribution), AttackDistribution[Record_Count], DESC)
+    )
+
+// Available Predictive Features Count
+Available_Features_Count = 
+    COUNTROWS(FeatureSummary)
+
+// =====================================================================================
+// PAGE 2: ATTACK BEHAVIOUR & PROTOCOL COMPOSITION MEASURES
+// =====================================================================================
+
+// TCP Traffic Share Percentage
+TCP_Share_Pct = 
+    CALCULATE(
+        MAX(ProtocolDistribution[Percentage]),
+        ProtocolDistribution[Protocol] = "tcp"
+    )
+
+// UDP Traffic Share Percentage
+UDP_Share_Pct = 
+    CALCULATE(
+        MAX(ProtocolDistribution[Percentage]),
+        ProtocolDistribution[Protocol] = "udp"
+    )
+
+// Selected Attack Record Volume
+Selected_Attack_Volume = 
+    SUM(AttackDistribution[Record_Count])
+
+// =====================================================================================
+// PAGE 3: STATISTICAL EVIDENCE & INFERENTIAL MEASURES
+// =====================================================================================
+
+// Total Hypotheses Tested
+Total_Hypotheses_Count = 
+    COUNTROWS(HypothesisTestResults)
+
+// Significant Tests at Alpha = 0.05 (Raw p-value)
+Significant_Tests_Raw_Count = 
+    CALCULATE(
+        COUNTROWS(HypothesisTestResults),
+        HypothesisTestResults[Significant_Raw] = TRUE()
+    )
+
+// Confirmed Significant Tests After Benjamini-Hochberg FDR Correction
+Significant_Tests_BH_Count = 
+    CALCULATE(
+        COUNTROWS(HypothesisTestResults),
+        HypothesisTestResults[Significant_BH] = TRUE()
+    )
+
+// Percentage of Tests Surviving Benjamini-Hochberg FDR
+FDR_Survival_Rate_Pct = 
+    DIVIDE([Significant_Tests_BH_Count], [Total_Hypotheses_Count], 0) * 100
+
+// =====================================================================================
+// PAGE 4: MACHINE LEARNING MODEL EVALUATION MEASURES
+// =====================================================================================
+
+// Random Forest Macro-F1 Score
+RF_Macro_F1 = 
+    CALCULATE(
+        MAX(ModelMetrics[Macro_F1]),
+        ModelMetrics[Model_Name] = "Random Forest"
+    )
+
+// Random Forest Balanced Accuracy
+RF_Balanced_Accuracy = 
+    CALCULATE(
+        MAX(ModelMetrics[Balanced_Accuracy]),
+        ModelMetrics[Model_Name] = "Random Forest"
+    )
+
+// Random Forest Raw Accuracy
+RF_Raw_Accuracy = 
+    CALCULATE(
+        MAX(ModelMetrics[Accuracy]),
+        ModelMetrics[Model_Name] = "Random Forest"
+    )
+
+// Majority-Class Baseline Macro-F1
+Baseline_Macro_F1 = 
+    CALCULATE(
+        MAX(ModelMetrics[Macro_F1]),
+        ModelMetrics[Model_Name] = "Majority-class baseline"
+    )
+
+// Majority-Class Baseline Balanced Accuracy
+Baseline_Balanced_Accuracy = 
+    CALCULATE(
+        MAX(ModelMetrics[Balanced_Accuracy]),
+        ModelMetrics[Model_Name] = "Majority-class baseline"
+    )
+
+// Macro-F1 Gain Over Baseline
+Macro_F1_Lift = 
+    [RF_Macro_F1] - [Baseline_Macro_F1]
+
+// Balanced Accuracy Gain Over Baseline
+Balanced_Accuracy_Lift = 
+    [RF_Balanced_Accuracy] - [Baseline_Balanced_Accuracy]
+
+// =====================================================================================
+// PAGE 5: DATA QUALITY & OUTLIER METRICS
+// =====================================================================================
+
+// High Outlier Features Count (> 15% records flagged)
+High_Outlier_Features_Count = 
+    CALCULATE(
+        COUNTROWS(FeatureSummary),
+        FeatureSummary[Outlier_Percentage] > 15.0
+    )
+
+// Maximum Feature Outlier Percentage
+Max_Feature_Outlier_Pct = 
+    MAX(FeatureSummary[Outlier_Percentage])

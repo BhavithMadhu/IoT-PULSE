@@ -1,0 +1,223 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<workbook source-build='2023.2.0' source-platform='mac' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <AccessibleZoneTabOrder />
+    <AutoCreateAndUpdateDSDPhoneLayouts />
+    <IntuitiveSorting />
+    <IntuitiveSorting_ctrl_pivot />
+    <MapboxVectorStylesAndLayers />
+    <MarkAnimation />
+    <SetMembershipControl />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <datasources>
+    <datasource caption='AttackDistribution' inline='true' name='federated.attack' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='AttackDistribution' name='textscan.attack'>
+            <connection class='textscan' directory='../exports' filename='AttackDistribution.csv' />
+          </named-connection>
+        </named-connections>
+      </connection>
+      <column datatype='string' name='[attack_type]' role='dimension' type='nominal' />
+      <column datatype='integer' name='[record_count]' role='measure' type='quantitative' />
+      <column datatype='real' name='[percentage]' role='measure' type='quantitative' />
+      <column datatype='boolean' name='[is_normal]' role='dimension' type='nominal' />
+    </datasource>
+
+    <datasource caption='ProtocolDistribution' inline='true' name='federated.proto' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='ProtocolDistribution' name='textscan.proto'>
+            <connection class='textscan' directory='../exports' filename='ProtocolDistribution.csv' />
+          </named-connection>
+        </named-connections>
+      </connection>
+      <column datatype='string' name='[proto]' role='dimension' type='nominal' />
+      <column datatype='integer' name='[record_count]' role='measure' type='quantitative' />
+      <column datatype='real' name='[percentage]' role='measure' type='quantitative' />
+    </datasource>
+
+    <datasource caption='HypothesisTestResults' inline='true' name='federated.hypo' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='HypothesisTestResults' name='textscan.hypo'>
+            <connection class='textscan' directory='../exports' filename='HypothesisTestResults.csv' />
+          </named-connection>
+        </named-connections>
+      </connection>
+      <column datatype='string' name='[question]' role='dimension' type='nominal' />
+      <column datatype='string' name='[test]' role='dimension' type='nominal' />
+      <column datatype='real' name='[statistic]' role='measure' type='quantitative' />
+      <column datatype='real' name='[p_value]' role='measure' type='quantitative' />
+      <column datatype='real' name='[p_value_adjusted_BH]' role='measure' type='quantitative' />
+      <column datatype='real' name='[effect_value]' role='measure' type='quantitative' />
+      <column datatype='boolean' name='[significant_BH_005]' role='dimension' type='nominal' />
+    </datasource>
+
+    <datasource caption='ModelMetrics' inline='true' name='federated.model' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='ModelMetrics' name='textscan.model'>
+            <connection class='textscan' directory='../exports' filename='ModelMetrics.csv' />
+          </named-connection>
+        </named-connections>
+      </connection>
+      <column datatype='string' name='[model]' role='dimension' type='nominal' />
+      <column datatype='real' name='[accuracy]' role='measure' type='quantitative' />
+      <column datatype='real' name='[balanced_accuracy]' role='measure' type='quantitative' />
+      <column datatype='real' name='[macro_F1]' role='measure' type='quantitative' />
+      <column datatype='real' name='[weighted_F1]' role='measure' type='quantitative' />
+    </datasource>
+
+    <datasource caption='FeatureImportance' inline='true' name='federated.imp' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='FeatureImportance' name='textscan.imp'>
+            <connection class='textscan' directory='../exports' filename='FeatureImportance.csv' />
+          </named-connection>
+        </named-connections>
+      </connection>
+      <column datatype='string' name='[feature]' role='dimension' type='nominal' />
+      <column datatype='real' name='[importance]' role='measure' type='quantitative' />
+    </datasource>
+  </datasources>
+
+  <worksheets>
+    <worksheet name='Attack Distribution'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='AttackDistribution' name='federated.attack' />
+          </datasources>
+          <datasource-dependencies datasource='federated.attack'>
+            <column datatype='string' name='[attack_type]' role='dimension' type='nominal' />
+            <column datatype='integer' name='[record_count]' role='measure' type='quantitative' />
+            <column datatype='boolean' name='[is_normal]' role='dimension' type='nominal' />
+            <column-instance column='[attack_type]' derivation='None' name='[none:attack_type:nk]' pivot='key' type='nominal' />
+            <column-instance column='[record_count]' derivation='Sum' name='[sum:record_count:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[is_normal]' derivation='None' name='[none:is_normal:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view><breakdown value='auto' /></view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.attack].[none:is_normal:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.attack].[none:attack_type:nk]</rows>
+        <cols>[federated.attack].[sum:record_count:qk]</cols>
+      </table>
+    </worksheet>
+
+    <worksheet name='Protocol Composition'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='ProtocolDistribution' name='federated.proto' />
+          </datasources>
+          <datasource-dependencies datasource='federated.proto'>
+            <column datatype='string' name='[proto]' role='dimension' type='nominal' />
+            <column datatype='integer' name='[record_count]' role='measure' type='quantitative' />
+            <column-instance column='[proto]' derivation='None' name='[none:proto:nk]' pivot='key' type='nominal' />
+            <column-instance column='[record_count]' derivation='Sum' name='[sum:record_count:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view><breakdown value='auto' /></view>
+            <mark class='Pie' />
+            <encodings>
+              <color column='[federated.proto].[none:proto:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows />
+        <cols>[federated.proto].[sum:record_count:qk]</cols>
+      </table>
+    </worksheet>
+
+    <worksheet name='Model Evaluation'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='ModelMetrics' name='federated.model' />
+          </datasources>
+          <datasource-dependencies datasource='federated.model'>
+            <column datatype='string' name='[model]' role='dimension' type='nominal' />
+            <column datatype='real' name='[macro_F1]' role='measure' type='quantitative' />
+            <column datatype='real' name='[balanced_accuracy]' role='measure' type='quantitative' />
+            <column-instance column='[model]' derivation='None' name='[none:model:nk]' pivot='key' type='nominal' />
+            <column-instance column='[macro_F1]' derivation='Sum' name='[sum:macro_F1:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[balanced_accuracy]' derivation='Sum' name='[sum:balanced_accuracy:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view><breakdown value='auto' /></view>
+            <mark class='Bar' />
+          </pane>
+        </panes>
+        <rows>[federated.model].[none:model:nk]</rows>
+        <cols>[federated.model].[sum:macro_F1:qk]</cols>
+      </table>
+    </worksheet>
+
+    <worksheet name='Feature Importances'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='FeatureImportance' name='federated.imp' />
+          </datasources>
+          <datasource-dependencies datasource='federated.imp'>
+            <column datatype='string' name='[feature]' role='dimension' type='nominal' />
+            <column datatype='real' name='[importance]' role='measure' type='quantitative' />
+            <column-instance column='[feature]' derivation='None' name='[none:feature:nk]' pivot='key' type='nominal' />
+            <column-instance column='[importance]' derivation='Sum' name='[sum:importance:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view><breakdown value='auto' /></view>
+            <mark class='Bar' />
+          </pane>
+        </panes>
+        <rows>[federated.imp].[none:feature:nk]</rows>
+        <cols>[federated.imp].[sum:importance:qk]</cols>
+      </table>
+    </worksheet>
+  </worksheets>
+
+  <dashboards>
+    <dashboard name='IoT PULSE Executive Dashboard'>
+      <style />
+      <size maxheight='800' maxwidth='1200' minheight='800' minwidth='1200' type='fixed' />
+      <zones>
+        <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
+          <zone h='50000' id='5' name='Attack Distribution' w='60000' x='0' y='0' />
+          <zone h='50000' id='6' name='Protocol Composition' w='40000' x='60000' y='0' />
+          <zone h='50000' id='7' name='Model Evaluation' w='50000' x='0' y='50000' />
+          <zone h='50000' id='8' name='Feature Importances' w='50000' x='50000' y='50000' />
+        </zone>
+      </zones>
+    </dashboard>
+  </dashboards>
+
+  <windows>
+    <window class='dashboard' maximized='true' name='IoT PULSE Executive Dashboard'>
+      <viewpoints />
+    </window>
+  </windows>
+</workbook>

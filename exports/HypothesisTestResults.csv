@@ -1,0 +1,13 @@
+question,test,statistic_name,statistic,p_value,p_value_adjusted_BH,n,effect_name,effect_value,significant_raw_005,significant_BH_005,notes
+Q2 Protocol × attack label,Chi-square independence,Chi-square (χ²),83803.1248,0.0,2.2250738585072014e-308,123117,Cramer's V,0.5834,True,True,
+Q3 Service group × attack label,Chi-square independence,Chi-square (χ²),301729.097,0.0,2.2250738585072014e-308,123117,Cramer's V,0.6391,True,True,Infrequent services (<100 records) collapsed into 'Other'
+Q4 Flow duration by attack label,Kruskal–Wallis,H-statistic,44749.4775,0.0,2.2250738585072014e-308,123089,Eta-squared (approx),0.3636,True,True,Labels with n>=30: 11 groups
+Q5 Total packets by attack label,Kruskal–Wallis,H-statistic,59302.9447,0.0,2.2250738585072014e-308,123089,Eta-squared (approx),0.4818,True,True,Labels with n>=30: 11 groups
+Q9 SYN flags by attack label,Kruskal–Wallis,H-statistic,57883.1961,0.0,2.2250738585072014e-308,123089,Eta-squared (approx),0.4703,True,True,Labels with n>=30: 11 groups
+Q13 Directional ratio by attack label,Kruskal–Wallis,H-statistic,35188.3746,0.0,2.2250738585072014e-308,123089,Eta-squared (approx),0.2859,True,True,Labels with n>=30: 11 groups
+Q10 High-SYN DOS_SYN_Hping vs Other,Two-proportion z-test,z-statistic,-196.124,0.0,2.2250738585072014e-308,123117,Difference in proportions,-0.3715,True,True,"Observational comparison, not randomized A/B test"
+Q6 Fwd vs bwd packet correlation,Spearman correlation,Spearman rho,0.7463,0.0,2.2250738585072014e-308,123117,Spearman rho,0.7463,True,True,
+Q11 Duration vs packet rate,Spearman correlation,Spearman rho,-0.2959,0.0,2.2250738585072014e-308,123117,Spearman rho,-0.2959,True,True,
+Q7 TCP vs UDP packet rate,Mann–Whitney U,U-statistic,1207681478.5,0.0,2.2250738585072014e-308,123060,Rank-biserial correlation,0.7314,True,True,"TCP n=110,427; UDP n=12,633"
+Q8 TCP vs UDP payload rate,Mann–Whitney U,U-statistic,1159424197.5,0.0,2.2250738585072014e-308,123060,Rank-biserial correlation,0.6622,True,True,"TCP n=110,427; UDP n=12,633"
+Q14 MQTT vs non-MQTT duration,Mann–Whitney U,U-statistic,488313532.0,0.0,2.2250738585072014e-308,123117,Rank-biserial correlation,0.9864,True,True,"MQTT n=4,132; non-MQTT n=118,985"
