@@ -247,25 +247,26 @@ function InteractiveNode({ node, isSelected, onSelect, theme = 'dark' }) {
       )}
 
       {/* HTML Label on 3D Node */}
-      <Html distanceFactor={12} position={[0, node.radius + 0.16, 0]} center>
+      <Html distanceFactor={5.2} position={[0, node.radius + 0.12, 0]} center>
         <div style={{
           background: isSelected 
             ? (theme === 'light' ? '#ffffff' : 'rgba(8, 11, 16, 0.95)') 
             : (theme === 'light' ? 'rgba(255, 255, 255, 0.92)' : 'rgba(12, 17, 24, 0.85)'),
-          border: `1px solid ${isSelected ? node.color : (theme === 'light' ? 'rgba(15, 23, 42, 0.2)' : 'rgba(148, 163, 184, 0.2)')}`,
-          padding: '2px 6px',
-          borderRadius: '4px',
-          fontSize: '9.5px',
+          border: `1px solid ${isSelected ? node.color : (theme === 'light' ? 'rgba(15, 23, 42, 0.18)' : 'rgba(148, 163, 184, 0.18)')}`,
+          padding: '1px 5px',
+          borderRadius: '3px',
+          fontSize: '7.5px',
+          letterSpacing: '0.02em',
           fontWeight: 600,
-          fontFamily: 'system-ui, -apple-system, sans-serif',
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
           color: theme === 'light' ? '#0f172a' : '#f1f5f9',
           whiteSpace: 'nowrap',
           pointerEvents: 'none',
           userSelect: 'none',
           boxShadow: isSelected 
-            ? `0 2px 12px ${node.color}60` 
-            : (theme === 'light' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none'),
-          transition: 'all 0.2s ease'
+            ? `0 2px 8px ${node.color}50` 
+            : (theme === 'light' ? '0 1px 4px rgba(15, 23, 42, 0.06)' : 'none'),
+          transition: 'all 0.15s ease'
         }}>
           {node.label} <span style={{ color: node.color, fontWeight: 700 }}>{node.percentage}%</span>
         </div>

@@ -38,19 +38,19 @@ function HubNode({ hub, theme = 'dark' }) {
           wireframe
         />
       </mesh>
-      <Html distanceFactor={12} position={[0, hub.radius + 0.15, 0]} center>
+      <Html distanceFactor={5.2} position={[0, hub.radius + 0.12, 0]} center>
         <div style={{
           background: theme === 'light' ? 'rgba(255, 255, 255, 0.94)' : 'rgba(8, 11, 16, 0.88)',
           border: `1px solid ${hub.color}`,
           color: theme === 'light' ? '#0f172a' : hub.color,
-          padding: '2px 6px',
-          borderRadius: 4,
-          fontSize: '9.5px',
+          padding: '1px 5px',
+          borderRadius: 3,
+          fontSize: '7.5px',
           fontWeight: 700,
-          fontFamily: 'system-ui, -apple-system, sans-serif',
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
           whiteSpace: 'nowrap',
           userSelect: 'none',
-          boxShadow: theme === 'light' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none'
+          boxShadow: theme === 'light' ? '0 1px 4px rgba(15, 23, 42, 0.06)' : 'none'
         }}>
           {hub.label}
         </div>
@@ -97,24 +97,24 @@ function ThreatSphere({ node, isSelected, onSelect, theme = 'dark' }) {
         />
       </mesh>
 
-      <Html distanceFactor={12} position={[0, node.r + 0.14, 0]} center>
+      <Html distanceFactor={5.2} position={[0, node.r + 0.12, 0]} center>
         <div style={{
           background: isSelected 
             ? (theme === 'light' ? '#ffffff' : 'rgba(8, 11, 16, 0.95)') 
             : (theme === 'light' ? 'rgba(255, 255, 255, 0.92)' : 'rgba(12, 17, 24, 0.85)'),
-          border: `1px solid ${isSelected ? node.color : (theme === 'light' ? 'rgba(15, 23, 42, 0.2)' : 'rgba(148, 163, 184, 0.2)')}`,
+          border: `1px solid ${isSelected ? node.color : (theme === 'light' ? 'rgba(15, 23, 42, 0.18)' : 'rgba(148, 163, 184, 0.18)')}`,
           color: theme === 'light' ? '#0f172a' : '#f1f5f9',
-          padding: '2px 6px',
-          borderRadius: 4,
-          fontSize: '9.5px',
+          padding: '1px 5px',
+          borderRadius: 3,
+          fontSize: '7.5px',
           fontWeight: 600,
-          fontFamily: 'system-ui, -apple-system, sans-serif',
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
           whiteSpace: 'nowrap',
           pointerEvents: 'none',
           userSelect: 'none',
           boxShadow: isSelected 
-            ? `0 2px 10px ${node.color}50` 
-            : (theme === 'light' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none')
+            ? `0 2px 8px ${node.color}50` 
+            : (theme === 'light' ? '0 1px 4px rgba(15, 23, 42, 0.06)' : 'none')
         }}>
           {node.label}
         </div>
