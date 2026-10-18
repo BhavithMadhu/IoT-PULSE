@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../api/client';
-import { Download, Server, RefreshCw, Menu, Sparkles, Database, Sun, Moon } from 'lucide-react';
+import { Download, Server, RefreshCw, Menu, Sparkles, Database, Sun, Moon, Home } from 'lucide-react';
 
 export default function Topbar({ activeTitle, onOpenMobile, theme, toggleTheme }) {
   const [health, setHealth] = useState(null);
@@ -80,6 +81,17 @@ export default function Topbar({ activeTitle, onOpenMobile, theme, toggleTheme }
               : 'Backend Offline'}
           </span>
         </div>
+
+        {/* Public Website Return Link */}
+        <Link
+          to="/"
+          className="btn btn-secondary"
+          style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+          title="Return to Public Website"
+        >
+          <Home size={14} />
+          <span>Public Website</span>
+        </Link>
 
         {/* Export Data Button */}
         <a 

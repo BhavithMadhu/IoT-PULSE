@@ -1,9 +1,21 @@
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   ShieldAlert, LayoutDashboard, Target, BarChart2, 
   HelpCircle, CheckCircle2, Cpu, Database, BookOpen,
-  Sparkles, X
+  Sparkles, X, ArrowLeft
 } from 'lucide-react';
+
+const PAGE_ROUTES = {
+  overview: '/dashboard',
+  attacks: '/dashboard/attacks',
+  eda: '/dashboard/eda',
+  statistics: '/dashboard/statistics',
+  hypotheses: '/dashboard/hypotheses',
+  model: '/dashboard/model',
+  explorer: '/dashboard/explorer',
+  methodology: '/dashboard/methodology'
+};
 
 const NAV_SECTIONS = [
   {
@@ -32,20 +44,32 @@ const NAV_SECTIONS = [
 ];
 
 export default function Sidebar({ activePage, setActivePage, mobileOpen, onCloseMobile, theme = 'dark', toggleTheme }) {
+  const navigate = useNavigate();
+
+  const handleNavClick = (id) => {
+    setActivePage(id);
+    if (PAGE_ROUTES[id]) {
+      navigate(PAGE_ROUTES[id]);
+    }
+    if (mobileOpen && onCloseMobile) onCloseMobile();
+  };
+
   return (
     <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
       {/* Brand Header */}
       <div className="sidebar-header">
-        <div className="brand-badge">
-          <ShieldAlert size={20} />
-        </div>
-        <div>
-          <div className="brand-title">
-            IoT PULSE
-            <span className="brand-badge-pill">3D SOC</span>
+        <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div className="brand-badge">
+            <ShieldAlert size={20} />
           </div>
-          <div className="brand-sub">Cybersecurity Intelligence</div>
-        </div>
+          <div>
+            <div className="brand-title">
+              IoT PULSE
+              <span className="brand-badge-pill">3D SOC</span>
+            </div>
+            <div className="brand-sub">Cybersecurity Intelligence</div>
+          </div>
+        </Link>
         {mobileOpen && (
           <button 
             onClick={onCloseMobile}
@@ -54,6 +78,31 @@ export default function Sidebar({ activePage, setActivePage, mobileOpen, onClose
             <X size={20} />
           </button>
         )}
+      </div>
+
+      {/* Return to Public Website Link */}
+      <div style={{ padding: '0 14px 12px 14px' }}>
+        <Link
+          to="/"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 7,
+            padding: '7px 11px',
+            background: theme === 'light' ? 'rgba(241, 245, 249, 0.95)' : 'rgba(23, 33, 44, 0.55)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--accent-cyan)',
+            fontSize: '0.74rem',
+            fontWeight: 600,
+            textDecoration: 'none',
+            transition: 'all 0.18s ease'
+          }}
+          className="sidebar-return-link"
+        >
+          <ArrowLeft size={13} />
+          <span>← Back to Public Website</span>
+        </Link>
       </div>
 
       {/* Nav List */}
@@ -68,10 +117,7 @@ export default function Sidebar({ activePage, setActivePage, mobileOpen, onClose
                 <button
                   key={item.id}
                   className={`nav-item ${isActive ? 'active' : ''}`}
-                  onClick={() => {
-                    setActivePage(item.id);
-                    if (mobileOpen && onCloseMobile) onCloseMobile();
-                  }}
+                  onClick={() => handleNavClick(item.id)}
                 >
                   <Icon size={17} style={{ color: isActive ? '#34d399' : '#94a3b8' }} />
                   <span>{item.label}</span>
