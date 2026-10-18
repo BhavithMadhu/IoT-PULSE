@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../api/client';
-import { Shield, ShieldAlert, Filter, Search, Terminal, Radio } from 'lucide-react';
+import { Shield, ShieldAlert, Filter, Search, Terminal, Radio, Sparkles, Layers } from 'lucide-react';
+import ThreatTopology3D from '../components/3d/ThreatTopology3D';
 
 const ATTACK_DESCRIPTIONS = {
   "DOS_SYN_Hping": "Volumetric TCP SYN flood simulation using Hping3. Flood generates high rates of incomplete handshakes to exhaust server TCP connection buffers.",
@@ -55,38 +56,62 @@ export default function AttackIntelligencePage() {
 
   return (
     <div className="page-wrapper">
-      <div style={{ marginBottom: '24px' }}>
-        <h1 className="page-title">Attack Intelligence & Threat Profiles</h1>
-        <p className="page-subtitle">
-          Comprehensive forensic taxonomy and distribution breakdown across all 12 recorded IoT traffic behaviors.
-        </p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">
+            <ShieldAlert size={26} style={{ color: 'var(--accent-rose)' }} />
+            Attack Intelligence & Spatial Threat Taxonomy
+          </h1>
+          <p className="page-subtitle">
+            Forensic taxonomy, behavioral profiles, and volume distributions across all 12 recorded IoT network behaviors.
+          </p>
+        </div>
+        <div className="chip chip-emerald">
+          <Sparkles size={14} />
+          <span>Multi-Dimensional Threat Clustering</span>
+        </div>
       </div>
 
+      {/* 3D Threat Constellation Visualizer */}
+      <ThreatTopology3D
+        selectedThreat={selectedAttack ? { id: selectedAttack.attack_type } : null}
+        onSelectThreat={(node) => {
+          const match = attacks.find((a) => a.attack_type === node.id || a.attack_type.includes(node.id));
+          if (match) setSelectedAttack(match);
+        }}
+      />
+
       {/* Filter and Control Toolbar */}
-      <div className="card" style={{ padding: '16px 20px', marginBottom: '24px' }}>
+      <div className="glass-panel" style={{ padding: '16px 20px', marginBottom: '24px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* Category buttons */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {['ALL', 'ATTACK', 'NORMAL', 'SCAN', 'DOS'].map((cat) => (
+            {[
+              { id: 'ALL', label: 'All Classes (12)' },
+              { id: 'ATTACK', label: 'Attacks Only (9)' },
+              { id: 'NORMAL', label: 'Normal IoT (3)' },
+              { id: 'SCAN', label: 'Port Scans (5)' },
+              { id: 'DOS', label: 'DoS / DDoS (2)' }
+            ].map((cat) => (
               <button
-                key={cat}
-                onClick={() => setFilterType(cat)}
-                className={`btn ${filterType === cat ? 'btn-cyan' : 'btn-outline'}`}
+                key={cat.id}
+                onClick={() => setFilterType(cat.id)}
+                className={`btn ${filterType === cat.id ? 'btn-primary' : 'btn-secondary'}`}
                 style={{ fontSize: '0.78rem', padding: '6px 12px' }}
               >
-                {cat === 'ALL' ? 'All Classes (12)' : cat === 'ATTACK' ? 'Attacks Only (9)' : cat === 'NORMAL' ? 'Normal IoT (3)' : cat === 'SCAN' ? 'Port Scans (5)' : 'DoS/DDoS (2)'}
+                {cat.label}
               </button>
             ))}
           </div>
 
           {/* Scale toggle & Search */}
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#94a3b8' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
               <span>Scale:</span>
               <button
                 onClick={() => setScale(scale === 'log' ? 'linear' : 'log')}
-                className="btn btn-outline"
-                style={{ padding: '4px 8px', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}
+                className="btn btn-secondary"
+                style={{ padding: '4px 10px', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}
               >
                 {scale === 'log' ? 'Logarithmic (log10)' : 'Linear'}
               </button>
@@ -98,28 +123,34 @@ export default function AttackIntelligencePage() {
                 placeholder="Search attack label..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                className="input-control"
                 style={{ paddingLeft: '32px', width: '220px' }}
               />
-              <Search size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: '#64748b' }} />
+              <Search size={14} style={{ position: 'absolute', left: '10px', top: '10px', color: 'var(--text-muted)' }} />
             </div>
           </div>
         </div>
       </div>
 
       {/* Two Column Layout: Visual Bars & Deep Profile */}
-      <div className="grid-2">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: '24px' }}>
         {/* Left Column: Interactive Attack List & Volume Bars */}
-        <div className="card">
-          <div className="card-title">
-            <span>Attack Volume Comparison ({scale.toUpperCase()} Scale)</span>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Click row to view profile</span>
+        <div className="glass-panel" style={{ marginBottom: 0 }}>
+          <div className="panel-header">
+            <div>
+              <div className="panel-title">
+                <Layers size={18} style={{ color: 'var(--accent-cyan)' }} />
+                Attack Volume Comparison ({scale.toUpperCase()} Scale)
+              </div>
+              <div className="panel-desc">Click any category row to inspect full forensic behavioral attributes</div>
+            </div>
+            <span className="chip">{filtered.length} Displayed</span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {filtered.map((item) => {
               const isSelected = selectedAttack?.attack_type === item.attack_type;
-              // Log scaling helper: log10(count) / log10(max)
-              const maxCount = attacks[0]?.record_count || 94659;
+              const maxCount = attacks[0]?.record_count || 94089;
               const barWidth = scale === 'log' 
                 ? (Math.log10(Math.max(item.record_count, 1)) / Math.log10(maxCount)) * 100
                 : (item.record_count / maxCount) * 100;
@@ -130,25 +161,26 @@ export default function AttackIntelligencePage() {
                   onClick={() => setSelectedAttack(item)}
                   style={{
                     padding: '12px 14px',
-                    borderRadius: '6px',
-                    background: isSelected ? 'rgba(6, 182, 212, 0.12)' : 'var(--bg-input)',
-                    border: `1px solid ${isSelected ? 'var(--cyan)' : 'var(--border)'}`,
+                    borderRadius: '8px',
+                    background: isSelected ? 'rgba(34, 211, 238, 0.12)' : 'rgba(14, 22, 34, 0.6)',
+                    border: `1px solid ${isSelected ? 'var(--accent-cyan)' : 'var(--border-subtle)'}`,
                     cursor: 'pointer',
-                    transition: 'all 0.15s ease'
+                    transition: 'all 0.15s ease',
+                    boxShadow: isSelected ? '0 0 15px rgba(34, 211, 238, 0.2)' : 'none'
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontWeight: 600, fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
+                      <span style={{ fontWeight: 600, fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                         {item.attack_type}
                       </span>
                       {item.is_normal ? (
-                        <span className="badge badge-normal" style={{ fontSize: '0.65rem' }}>Normal</span>
+                        <span className="chip chip-emerald" style={{ padding: '1px 6px', fontSize: '0.65rem' }}>Normal</span>
                       ) : (
-                        <span className="badge badge-attack" style={{ fontSize: '0.65rem' }}>Attack</span>
+                        <span className="chip" style={{ padding: '1px 6px', fontSize: '0.65rem', color: 'var(--accent-rose)', borderColor: 'rgba(244, 63, 94, 0.3)' }}>Attack</span>
                       )}
                     </div>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: isSelected ? 'var(--accent-cyan)' : 'var(--text-secondary)' }}>
                       {item.record_count.toLocaleString()} ({item.percentage}%)
                     </span>
                   </div>
@@ -157,8 +189,12 @@ export default function AttackIntelligencePage() {
                     <div 
                       className="bar-fill" 
                       style={{ 
-                        width: `${Math.max(barWidth, 1)}%`,
-                        backgroundColor: item.is_normal ? '#10b981' : isSelected ? '#06b6d4' : '#f43f5e'
+                        width: `${Math.max(barWidth, 1.2)}%`,
+                        backgroundColor: item.is_normal 
+                          ? 'var(--accent-emerald)' 
+                          : isSelected 
+                            ? 'var(--accent-cyan)' 
+                            : 'var(--accent-rose)'
                       }} 
                     />
                   </div>
@@ -171,58 +207,58 @@ export default function AttackIntelligencePage() {
         {/* Right Column: Detailed Selected Profile */}
         <div>
           {selectedAttack && (
-            <div className="card" style={{ borderTop: `3px solid ${selectedAttack.is_normal ? '#10b981' : '#f43f5e'}` }}>
+            <div className="glass-panel" style={{ borderTop: `3px solid ${selectedAttack.is_normal ? 'var(--accent-emerald)' : 'var(--accent-rose)'}`, marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
                 <div>
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-mono)' }}>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-mono)' }}>
                     {selectedAttack.attack_type}
                   </h3>
-                  <div style={{ fontSize: '0.8rem', color: selectedAttack.is_normal ? '#10b981' : '#f43f5e', marginTop: '2px' }}>
+                  <div style={{ fontSize: '0.8rem', color: selectedAttack.is_normal ? 'var(--accent-emerald)' : 'var(--accent-rose)', marginTop: '2px', fontWeight: 600 }}>
                     {selectedAttack.is_normal ? 'Benign IoT Telemetry Stream' : 'Simulated Malicious Vector'}
                   </div>
                 </div>
 
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#fff' }}>
+                  <div style={{ fontSize: '1.45rem', fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#fff' }}>
                     {selectedAttack.record_count.toLocaleString()}
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                     {selectedAttack.percentage}% of Total Flows
                   </div>
                 </div>
               </div>
 
-              <div style={{ padding: '12px', background: 'var(--bg-input)', borderRadius: '6px', marginBottom: '18px', fontSize: '0.85rem', lineHeight: '1.6' }}>
+              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '8px', marginBottom: '18px', fontSize: '0.85rem', lineHeight: '1.6', border: '1px solid var(--border-subtle)' }}>
                 {ATTACK_DESCRIPTIONS[selectedAttack.attack_type] || "Network traffic profile documented in the RT-IOT2022 cybersecurity dataset."}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '18px' }}>
-                <div style={{ padding: '10px', background: 'var(--bg-sidebar)', borderRadius: '6px', border: '1px solid var(--border)' }}>
-                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase' }}>Classification Role</div>
-                  <div style={{ fontWeight: 600, color: '#f8fafc', marginTop: '2px' }}>
+                <div style={{ padding: '12px', background: 'rgba(12, 17, 24, 0.6)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Classification Role</div>
+                  <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginTop: '4px' }}>
                     {selectedAttack.percentage > 10 ? 'Majority Class' : selectedAttack.percentage > 1 ? 'Core Class' : 'Rare Minority Class'}
                   </div>
                 </div>
 
-                <div style={{ padding: '10px', background: 'var(--bg-sidebar)', borderRadius: '6px', border: '1px solid var(--border)' }}>
-                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase' }}>Sample Status</div>
-                  <div style={{ fontWeight: 600, color: '#f8fafc', marginTop: '2px' }}>
+                <div style={{ padding: '12px', background: 'rgba(12, 17, 24, 0.6)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Sample Status</div>
+                  <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginTop: '4px' }}>
                     {selectedAttack.record_count >= 30 ? 'Included in Hypothesis Tests (n >= 30)' : 'Excluded from KW Tests (n < 30)'}
                   </div>
                 </div>
               </div>
 
-              <div style={{ fontSize: '0.82rem', color: '#94a3b8', borderTop: '1px solid var(--border)', paddingTop: '14px' }}>
-                <strong>SOC Forensics Context:</strong> This label exhibits specific feature fingerprints (e.g. TCP flags, duration, and forward/backward symmetry). To explore matching flow tuples and download raw CSV extracts, navigate to the <strong>Data Explorer</strong>.
+              <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', borderTop: '1px solid var(--border-subtle)', paddingTop: '14px', lineHeight: 1.5 }}>
+                <strong style={{ color: 'var(--text-primary)' }}>SOC Forensics Context:</strong> This label exhibits specific feature fingerprints (e.g. TCP flags, duration, and forward/backward symmetry). To explore matching flow tuples and download raw CSV extracts, navigate to the <strong>Data Explorer</strong>.
               </div>
             </div>
           )}
 
           {/* Imbalance warning callout */}
           <div className="alert-box alert-warning">
-            <ShieldAlert size={20} style={{ color: '#f59e0b', flexShrink: 0 }} />
+            <ShieldAlert size={22} style={{ color: 'var(--accent-amber)', flexShrink: 0 }} />
             <div>
-              <strong>Academic Methodology Alert (Q1):</strong> The ratio between the largest class (<code>DOS_SYN_Hping</code>: 94,659) and smallest class (<code>NMAP_FIN_SCAN</code>: 28) exceeds <strong>3,380:1</strong>. Standard accuracy is practically meaningless; machine learning models must be assessed using Macro-F1 and per-class recall.
+              <strong>Academic Methodology Alert (Q1):</strong> The ratio between the largest class (<code>DOS_SYN_Hping</code>: 94,089) and smallest class (<code>Thing_Speak</code>: 27) exceeds <strong>3,380:1</strong>. Standard accuracy is practically meaningless; machine learning models must be assessed using Macro-F1 and per-class recall.
             </div>
           </div>
         </div>

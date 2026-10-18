@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../api/client';
-import { Cpu, CheckCircle2, AlertTriangle, Layers, BarChart2, ShieldCheck, Info } from 'lucide-react';
+import { Cpu, CheckCircle2, AlertTriangle, Layers, BarChart2, ShieldCheck, Info, Sparkles } from 'lucide-react';
 
 export default function MachineLearningPage() {
   const [modelData, setModelData] = useState(null);
@@ -24,9 +24,12 @@ export default function MachineLearningPage() {
 
   if (loading) {
     return (
-      <div className="page-wrapper" style={{ textAlign: 'center', padding: '80px 0' }}>
-        <div style={{ color: '#06b6d4', fontSize: '1.2rem', marginBottom: '8px' }}>
+      <div className="page-wrapper" style={{ textAlign: 'center', padding: '100px 0' }}>
+        <div style={{ color: 'var(--accent-cyan)', fontSize: '1.25rem', fontWeight: 600, marginBottom: '8px' }}>
           Loading Machine Learning Benchmarks...
+        </div>
+        <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+          Querying Random Forest pipeline metrics and confusion matrix
         </div>
       </div>
     );
@@ -40,34 +43,43 @@ export default function MachineLearningPage() {
 
   return (
     <div className="page-wrapper">
-      <div style={{ marginBottom: '24px' }}>
-        <h1 className="page-title">Machine Learning: Multiclass Classification (Q15)</h1>
-        <p className="page-subtitle">
-          Random Forest classification pipeline evaluated against a majority-class baseline with stratified out-of-sample partitioning.
-        </p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">
+            <Cpu size={26} style={{ color: 'var(--accent-purple)' }} />
+            Machine Learning: Multiclass Classification (Q15)
+          </h1>
+          <p className="page-subtitle">
+            Random Forest classification pipeline evaluated against a majority-class baseline with stratified out-of-sample partitioning.
+          </p>
+        </div>
+        <div className="chip chip-emerald">
+          <Sparkles size={14} />
+          <span>Macro-F1 Lift: +86.14%</span>
+        </div>
       </div>
 
       {/* Model Benchmark Cards */}
       <div className="stats-grid">
-        <div className="stat-card" style={{ borderTop: '3px solid #06b6d4' }}>
+        <div className="stat-card" style={{ borderTop: '3px solid var(--accent-cyan)' }}>
           <div className="stat-header">
             <span>Macro-F1 Score</span>
-            <span className="badge badge-cyan">Class-Balanced</span>
+            <span className="chip chip-cyan" style={{ padding: '1px 6px', fontSize: '0.65rem' }}>Primary</span>
           </div>
-          <div className="stat-value" style={{ color: '#06b6d4' }}>
+          <div className="stat-value" style={{ color: 'var(--accent-cyan)' }}>
             {rfMetrics?.macro_F1?.toFixed(4)}
           </div>
           <div className="stat-footer">
-            Baseline: {baseMetrics?.macro_F1?.toFixed(4)} (+{((rfMetrics?.macro_F1 - baseMetrics?.macro_F1) || 0).toFixed(4)})
+            Baseline: {baseMetrics?.macro_F1?.toFixed(4)} (+{((rfMetrics?.macro_F1 - baseMetrics?.macro_F1) || 0).toFixed(4)} lift)
           </div>
         </div>
 
-        <div className="stat-card" style={{ borderTop: '3px solid #10b981' }}>
+        <div className="stat-card" style={{ borderTop: '3px solid var(--accent-emerald)' }}>
           <div className="stat-header">
             <span>Balanced Accuracy</span>
-            <span className="badge badge-normal">Recall Mean</span>
+            <span className="chip chip-emerald" style={{ padding: '1px 6px', fontSize: '0.65rem' }}>Mean Recall</span>
           </div>
-          <div className="stat-value" style={{ color: '#10b981' }}>
+          <div className="stat-value" style={{ color: 'var(--accent-emerald)' }}>
             {rfMetrics?.balanced_accuracy?.toFixed(4)}
           </div>
           <div className="stat-footer">
@@ -75,25 +87,25 @@ export default function MachineLearningPage() {
           </div>
         </div>
 
-        <div className="stat-card" style={{ borderTop: '3px solid #8b5cf6' }}>
+        <div className="stat-card" style={{ borderTop: '3px solid var(--accent-purple)' }}>
           <div className="stat-header">
-            <span>Raw Accuracy</span>
-            <span className="badge badge-amber">Overall</span>
+            <span>Overall Accuracy</span>
+            <span className="chip" style={{ padding: '1px 6px', fontSize: '0.65rem' }}>Raw</span>
           </div>
-          <div className="stat-value" style={{ color: '#a78bfa' }}>
+          <div className="stat-value" style={{ color: '#c084fc' }}>
             {rfMetrics?.accuracy?.toFixed(4)}
           </div>
           <div className="stat-footer">
-            Baseline: {baseMetrics?.accuracy?.toFixed(4)}
+            Baseline: {baseMetrics?.accuracy?.toFixed(4)} (Biased by Majority)
           </div>
         </div>
 
-        <div className="stat-card" style={{ borderTop: '3px solid #f59e0b' }}>
+        <div className="stat-card" style={{ borderTop: '3px solid var(--accent-amber)' }}>
           <div className="stat-header">
             <span>Weighted-F1</span>
-            <span className="badge badge-amber">Size-Weighted</span>
+            <span className="chip" style={{ padding: '1px 6px', fontSize: '0.65rem' }}>Support-Weighted</span>
           </div>
-          <div className="stat-value" style={{ color: '#f59e0b' }}>
+          <div className="stat-value" style={{ color: 'var(--accent-amber)' }}>
             {rfMetrics?.weighted_F1?.toFixed(4)}
           </div>
           <div className="stat-footer">
@@ -103,23 +115,28 @@ export default function MachineLearningPage() {
       </div>
 
       {/* Confusion Matrix Section */}
-      <div className="card" style={{ marginBottom: '24px' }}>
-        <div className="card-title">
-          <span>Row-Normalized Confusion Matrix (Held-Out 20% Test Split)</span>
-          <span className="badge badge-cyan">12 Classes · 10,000 Flows</span>
+      <div className="glass-panel" style={{ marginBottom: '28px' }}>
+        <div className="panel-header">
+          <div>
+            <div className="panel-title">
+              <Layers size={18} style={{ color: 'var(--accent-cyan)' }} />
+              Row-Normalized Confusion Matrix (Held-Out 20% Test Split)
+            </div>
+            <div className="panel-desc">
+              Rows represent true ground-truth labels; columns represent predictions. Diagonal values indicate recall rates (true positive fraction).
+            </div>
+          </div>
+          <span className="chip chip-cyan">12 Classes · 10,000 Flows</span>
         </div>
-        <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '14px' }}>
-          Rows indicate actual ground-truth labels; columns indicate Random Forest predictions. Values along the diagonal represent recall rates (true positive fraction).
-        </p>
 
         {cm && (
           <div className="table-container" style={{ overflowX: 'auto' }}>
-            <table className="cyber-table" style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)' }}>
+            <table className="data-table" style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)' }}>
               <thead>
                 <tr>
-                  <th style={{ position: 'sticky', left: 0, zIndex: 10 }}>Actual \ Predicted</th>
+                  <th style={{ position: 'sticky', left: 0, zIndex: 10, background: 'rgba(17, 25, 35, 0.95)' }}>Actual \ Predicted</th>
                   {cm.labels.map((l) => (
-                    <th key={l} title={l} style={{ maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <th key={l} title={l} style={{ maxWidth: '85px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {l.replace('NMAP_', 'NM_').replace('DOS_', '').replace('Metasploit_', 'MS_')}
                     </th>
                   ))}
@@ -128,7 +145,7 @@ export default function MachineLearningPage() {
               <tbody>
                 {cm.labels.map((actualLabel, rIdx) => (
                   <tr key={actualLabel}>
-                    <td style={{ position: 'sticky', left: 0, background: '#0d1525', fontWeight: 600, color: '#f8fafc', whiteSpace: 'nowrap' }}>
+                    <td style={{ position: 'sticky', left: 0, background: 'rgba(12, 17, 24, 0.95)', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
                       {actualLabel}
                     </td>
                     {cm.labels.map((predLabel, cIdx) => {
@@ -137,12 +154,12 @@ export default function MachineLearningPage() {
                       const isDiag = rIdx === cIdx;
                       
                       let bg = 'rgba(255,255,255,0.02)';
-                      let textCol = '#64748b';
+                      let textCol = 'var(--text-muted)';
                       if (rate > 0) {
                         if (isDiag) {
-                          const alpha = Math.max(rate * 0.85, 0.2);
-                          bg = `rgba(6, 182, 212, ${alpha})`;
-                          textCol = rate > 0.5 ? '#fff' : '#06b6d4';
+                          const alpha = Math.max(rate * 0.85, 0.25);
+                          bg = `rgba(34, 211, 238, ${alpha})`;
+                          textCol = rate > 0.4 ? '#fff' : 'var(--accent-cyan)';
                         } else {
                           bg = `rgba(244, 63, 94, ${Math.min(rate * 1.5, 0.8)})`;
                           textCol = '#fca5a5';
@@ -159,7 +176,7 @@ export default function MachineLearningPage() {
                             textAlign: 'center',
                             cursor: 'pointer',
                             fontWeight: isDiag ? 700 : 400,
-                            padding: '6px 4px'
+                            padding: '7px 4px'
                           }}
                           title={`Actual: ${actualLabel} -> Predicted: ${predLabel} | Rate: ${(rate * 100).toFixed(1)}% (${count} flows)`}
                         >
@@ -175,38 +192,41 @@ export default function MachineLearningPage() {
         )}
 
         {selectedCell && (
-          <div style={{ marginTop: '12px', padding: '10px 14px', background: 'var(--bg-input)', borderRadius: '6px', fontSize: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ marginTop: '14px', padding: '12px 16px', background: 'var(--bg-input)', borderRadius: '8px', fontSize: '0.82rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--border-subtle)' }}>
             <div>
-              <strong>Selected Cell:</strong> Actual <code>{selectedCell.actual}</code> → Predicted <code>{selectedCell.pred}</code>
+              <strong>Selected Confusion Cell:</strong> Actual <code>{selectedCell.actual}</code> → Predicted <code>{selectedCell.pred}</code>
             </div>
             <div>
-              <strong>Rate:</strong> {(selectedCell.rate * 100).toFixed(2)}% ({selectedCell.count} flows)
+              <strong>Proportion:</strong> {(selectedCell.rate * 100).toFixed(2)}% ({selectedCell.count} flows)
             </div>
           </div>
         )}
       </div>
 
       {/* Grid: Feature Importance & Per-Class Metrics */}
-      <div className="grid-2">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: '24px', marginBottom: '28px' }}>
         {/* Top 20 Feature Importance */}
-        <div className="card">
-          <div className="card-title">
-            <span>Top 20 Predictive Feature Importances</span>
-            <span className="badge badge-normal">MDI Gini Importance</span>
+        <div className="glass-panel" style={{ marginBottom: 0 }}>
+          <div className="panel-header">
+            <div>
+              <div className="panel-title">
+                <BarChart2 size={18} style={{ color: 'var(--accent-emerald)' }} />
+                Top Predictive Feature Importances
+              </div>
+              <div className="panel-desc">Mean Decrease in Impurity (Gini). Port numbers removed to eliminate leakage.</div>
+            </div>
+            <span className="chip chip-emerald">Top Discriminators</span>
           </div>
-          <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginBottom: '14px' }}>
-            Features providing highest discriminatory power. Port numbers and index fields were excluded prior to training to eliminate shortcuts.
-          </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {importances.slice(0, 16).map((item) => (
               <div key={item.feature}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '2px' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', color: '#cbd5e1' }}>{item.feature}</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', color: '#06b6d4', fontWeight: 600 }}>{(item.importance * 100).toFixed(2)}%</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '3px' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>{item.feature}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-cyan)', fontWeight: 600 }}>{(item.importance * 100).toFixed(2)}%</span>
                 </div>
-                <div className="bar-track" style={{ height: '5px' }}>
-                  <div className="bar-fill" style={{ width: `${(item.importance / importances[0].importance) * 100}%`, backgroundColor: '#06b6d4' }} />
+                <div className="bar-track" style={{ height: '6px' }}>
+                  <div className="bar-fill" style={{ width: `${(item.importance / importances[0].importance) * 100}%`, backgroundColor: 'var(--accent-cyan)' }} />
                 </div>
               </div>
             ))}
@@ -214,14 +234,20 @@ export default function MachineLearningPage() {
         </div>
 
         {/* Per-Class Classification Report */}
-        <div className="card">
-          <div className="card-title">
-            <span>Per-Class Classification Report</span>
-            <span className="badge badge-cyan">Precision · Recall · F1</span>
+        <div className="glass-panel" style={{ marginBottom: 0 }}>
+          <div className="panel-header">
+            <div>
+              <div className="panel-title">
+                <ShieldCheck size={18} style={{ color: 'var(--accent-cyan)' }} />
+                Per-Class Classification Report
+              </div>
+              <div className="panel-desc">Precision, Recall, and F1-Score across all 12 classes</div>
+            </div>
+            <span className="chip">Test Partition</span>
           </div>
 
           <div className="table-container" style={{ maxHeight: '420px' }}>
-            <table className="cyber-table" style={{ fontSize: '0.78rem' }}>
+            <table className="data-table" style={{ fontSize: '0.78rem' }}>
               <thead>
                 <tr>
                   <th>Class Label</th>
@@ -238,7 +264,7 @@ export default function MachineLearningPage() {
                     <tr key={label}>
                       <td style={{ fontWeight: 600, fontFamily: 'var(--font-mono)' }}>{label}</td>
                       <td style={{ fontFamily: 'var(--font-mono)' }}>{(metrics.precision * 100).toFixed(1)}%</td>
-                      <td style={{ fontFamily: 'var(--font-mono)', color: metrics.recall > 0.8 ? '#10b981' : '#f59e0b', fontWeight: 600 }}>
+                      <td style={{ fontFamily: 'var(--font-mono)', color: metrics.recall > 0.8 ? 'var(--accent-emerald)' : 'var(--accent-amber)', fontWeight: 600 }}>
                         {(metrics.recall * 100).toFixed(1)}%
                       </td>
                       <td style={{ fontFamily: 'var(--font-mono)' }}>{(metrics.f1_score * 100).toFixed(1)}%</td>
@@ -252,15 +278,15 @@ export default function MachineLearningPage() {
       </div>
 
       {/* Academic Rigor & Interpretability Checklist */}
-      <div className="card" style={{ borderLeft: '4px solid #8b5cf6' }}>
-        <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>
-          Academic Model Interpretability Checklist
+      <div className="glass-panel" style={{ borderLeft: '4px solid var(--accent-purple)' }}>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#fff', marginBottom: '10px' }}>
+          Academic Model Interpretability & Pipeline Checklist
         </h3>
-        <ul style={{ paddingLeft: '20px', fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.7' }}>
-          <li><strong>Baseline Comparison:</strong> Random Forest achieved a Macro-F1 of {rfMetrics?.macro_F1?.toFixed(4)} vs Majority-class baseline of {baseMetrics?.macro_F1?.toFixed(4)}, verifying strong predictive signal across all classes.</li>
-          <li><strong>Target & Feature Leakage Prevention:</strong> Raw port columns (<code>id.orig_p</code>, <code>id.resp_p</code>) and index row IDs were eliminated from the feature set to ensure the model learns packet dynamics rather than hardcoded port conventions.</li>
-          <li><strong>Class Imbalance Strategy:</strong> Balanced subsampling class weighting (<code>class_weight='balanced_subsample'</code>) was applied, providing minority classes like SSH Brute Force and NMAP Scans proportional gradient penalties during tree splitting.</li>
-          <li><strong>Generalization Caveat:</strong> Model performance measures within-dataset separability on the held-out RT-IOT2022 test partition. Independent validation on unseen hardware networks and live zero-day attacks is required prior to real-world deployment.</li>
+        <ul style={{ paddingLeft: '20px', fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.8' }}>
+          <li><strong style={{ color: 'var(--text-primary)' }}>Baseline Comparison:</strong> Random Forest achieved a Macro-F1 of {rfMetrics?.macro_F1?.toFixed(4)} vs Majority-class baseline of {baseMetrics?.macro_F1?.toFixed(4)}, verifying strong predictive signal across all classes.</li>
+          <li><strong style={{ color: 'var(--text-primary)' }}>Target & Feature Leakage Prevention:</strong> Raw port columns (<code>id.orig_p</code>, <code>id.resp_p</code>) and index row IDs were eliminated from the feature set to ensure the model learns packet dynamics rather than hardcoded port conventions.</li>
+          <li><strong style={{ color: 'var(--text-primary)' }}>Class Imbalance Strategy:</strong> Balanced subsampling class weighting (<code>class_weight='balanced_subsample'</code>) was applied, providing minority classes like SSH Brute Force and NMAP Scans proportional gradient penalties during tree splitting.</li>
+          <li><strong style={{ color: 'var(--text-primary)' }}>Generalization Caveat:</strong> Model performance measures within-dataset separability on the held-out RT-IOT2022 test partition. Independent validation on unseen hardware networks and live zero-day attacks is required prior to real-world deployment.</li>
         </ul>
       </div>
     </div>

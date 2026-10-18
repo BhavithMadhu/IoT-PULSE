@@ -11,18 +11,19 @@ import DataExplorerPage from './pages/DataExplorerPage';
 import MethodologyPage from './pages/MethodologyPage';
 
 const PAGE_TITLES = {
-  overview: 'Overview Dashboard',
-  attacks: 'Attack Intelligence & Taxonomy',
-  eda: 'Exploratory Data Analysis & Correlations',
+  overview: 'Executive Cybersecurity Overview',
+  attacks: 'Attack Intelligence & Spatial Threat Taxonomy',
+  eda: 'Exploratory Data Analysis & Empirical Distributions',
   statistics: 'Empirical Statistical Investigation (15 Questions)',
-  hypotheses: 'Hypothesis Testing & FDR Correction',
-  model: 'Machine Learning: Random Forest (Q15)',
-  explorer: 'DuckDB In-Memory Data Explorer',
-  methodology: 'Methodology, Academic Rigor & Conclusions'
+  hypotheses: 'Inferential Hypothesis Testing & FDR Control',
+  model: 'Machine Learning: Random Forest Classifier (Q15)',
+  explorer: 'DuckDB In-Memory OLAP Data Explorer',
+  methodology: 'Academic Methodology, Rigour & Evidence'
 };
 
 export default function App() {
   const [activePage, setActivePage] = useState('overview');
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const renderPage = () => {
     switch (activePage) {
@@ -49,9 +50,17 @@ export default function App() {
 
   return (
     <div className="app-container">
-      <Sidebar activePage={activePage} setActivePage={setActivePage} />
+      <Sidebar 
+        activePage={activePage} 
+        setActivePage={setActivePage} 
+        mobileOpen={mobileOpen}
+        onCloseMobile={() => setMobileOpen(false)}
+      />
       <div className="main-content">
-        <Topbar activeTitle={PAGE_TITLES[activePage] || 'IoT PULSE Analytics'} />
+        <Topbar 
+          activeTitle={PAGE_TITLES[activePage] || 'IoT PULSE Analytics'} 
+          onOpenMobile={() => setMobileOpen(true)}
+        />
         <main>
           {renderPage()}
         </main>

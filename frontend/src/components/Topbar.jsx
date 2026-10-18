@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../api/client';
-import { Activity, Download, Server, RefreshCw } from 'lucide-react';
+import { Download, Server, RefreshCw, Menu, Sparkles, Database } from 'lucide-react';
 
-export default function Topbar({ activeTitle }) {
+export default function Topbar({ activeTitle, onOpenMobile }) {
   const [health, setHealth] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const checkHealth = async () => {
     try {
@@ -24,39 +24,53 @@ export default function Topbar({ activeTitle }) {
 
   return (
     <header className="topbar">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#f8fafc' }}>
-          {activeTitle}
-        </h2>
+      <div className="topbar-left">
+        <button
+          onClick={onOpenMobile}
+          className="hero-btn"
+          style={{ display: 'none' }} // Visible on mobile via CSS media query
+          id="mobile-menu-trigger"
+        >
+          <Menu size={18} />
+        </button>
+
+        <div className="topbar-title-wrapper">
+          <h2 className="topbar-page-title">
+            {activeTitle}
+          </h2>
+          <span className="topbar-breadcrumb">
+            IoT PULSE / Analytics / {activeTitle}
+          </span>
+        </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {/* Backend status indicator */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem' }}>
+      <div className="topbar-right">
+        {/* Backend status chip */}
+        <div className="chip chip-emerald">
           <span style={{
-            width: '8px',
-            height: '8px',
+            width: 7,
+            height: 7,
             borderRadius: '50%',
-            backgroundColor: health?.status === 'healthy' ? '#10b981' : '#f43f5e',
-            boxShadow: health?.status === 'healthy' ? '0 0 8px #10b981' : '0 0 8px #f43f5e'
+            backgroundColor: health?.status === 'healthy' ? '#34d399' : '#f43f5e',
+            display: 'inline-block'
           }} />
-          <span style={{ color: '#94a3b8' }}>
+          <span>
             {health?.status === 'healthy' 
-              ? `FastAPI + DuckDB Active (${health.total_records?.toLocaleString()} flows)` 
+              ? `FastAPI + DuckDB (${health.total_records?.toLocaleString()} flows)` 
               : 'Backend Offline'}
           </span>
         </div>
 
-        {/* Quick CSV Export Download button */}
+        {/* Export Data Button */}
         <a 
           href={api.getExportUrl('iot_pulse_clean_flows')}
           download="iot_pulse_clean_flows.csv"
-          className="btn btn-outline"
+          className="btn btn-secondary"
           style={{ padding: '6px 12px', fontSize: '0.78rem' }}
           title="Download Curated Flows CSV"
         >
           <Download size={14} />
-          <span>Export Clean CSV</span>
+          <span>Export Curated CSV</span>
         </a>
       </div>
     </header>
