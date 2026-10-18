@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../api/client';
-import { Download, Server, RefreshCw, Menu, Sparkles, Database } from 'lucide-react';
+import { Download, Server, RefreshCw, Menu, Sparkles, Database, Sun, Moon } from 'lucide-react';
 
-export default function Topbar({ activeTitle, onOpenMobile }) {
+export default function Topbar({ activeTitle, onOpenMobile, theme, toggleTheme }) {
   const [health, setHealth] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -45,6 +45,26 @@ export default function Topbar({ activeTitle, onOpenMobile }) {
       </div>
 
       <div className="topbar-right">
+        {/* Dark / Light Mode Switcher */}
+        <button
+          onClick={toggleTheme}
+          className="theme-toggle-btn"
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+          aria-label="Toggle visual theme"
+        >
+          {theme === 'dark' ? (
+            <>
+              <Sun size={15} style={{ color: '#f59e0b' }} />
+              <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Light</span>
+            </>
+          ) : (
+            <>
+              <Moon size={15} style={{ color: '#0284c7' }} />
+              <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Dark</span>
+            </>
+          )}
+        </button>
+
         {/* Backend status chip */}
         <div className="chip chip-emerald">
           <span style={{

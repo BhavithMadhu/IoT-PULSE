@@ -18,7 +18,7 @@ const ATTACK_DESCRIPTIONS = {
   "NMAP_FIN_SCAN": "Stealth reconnaissance scanning technique sending bare TCP FIN packets without prior SYN synchronization."
 };
 
-export default function AttackIntelligencePage() {
+export default function AttackIntelligencePage({ theme }) {
   const [attacks, setAttacks] = useState([]);
   const [filterType, setFilterType] = useState('ALL');
   const [search, setSearch] = useState('');
@@ -79,6 +79,7 @@ export default function AttackIntelligencePage() {
           const match = attacks.find((a) => a.attack_type === node.id || a.attack_type.includes(node.id));
           if (match) setSelectedAttack(match);
         }}
+        theme={theme}
       />
 
       {/* Filter and Control Toolbar */}

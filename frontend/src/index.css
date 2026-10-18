@@ -57,6 +57,49 @@
   --radius-xl: 20px;
 }
 
+/* Light Mode Theme Palette */
+[data-theme="light"] {
+  /* Clean Scientific Slate / White Laboratory Palette */
+  --bg-deep: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-elevated: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --bg-input: #f1f5f9;
+  
+  /* High-Contrast Luminous Accents */
+  --accent-emerald: #059669;
+  --accent-emerald-glow: rgba(5, 150, 105, 0.25);
+  --accent-emerald-subtle: rgba(5, 150, 105, 0.1);
+  --accent-cyan: #0284c7;
+  --accent-cyan-glow: rgba(2, 132, 199, 0.25);
+  --accent-cyan-subtle: rgba(2, 132, 199, 0.1);
+  --accent-amber: #d97706;
+  --accent-amber-glow: rgba(217, 119, 6, 0.2);
+  --accent-amber-subtle: rgba(217, 119, 6, 0.1);
+  --accent-rose: #e11d48;
+  --accent-rose-glow: rgba(225, 29, 72, 0.25);
+  --accent-rose-subtle: rgba(225, 29, 72, 0.1);
+  --accent-purple: #7c3aed;
+  --accent-blue: #2563eb;
+
+  /* Typography & Text */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  /* Borders & Shadows */
+  --border-subtle: rgba(15, 23, 42, 0.1);
+  --border-glass: rgba(15, 23, 42, 0.15);
+  --border-focus: var(--accent-cyan);
+  --border-active: var(--accent-emerald);
+  --shadow-soft: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(15, 23, 42, 0.06);
+  --shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(15, 23, 42, 0.08);
+  --shadow-elevated: 0 16px 36px -8px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(5, 150, 105, 0.25);
+  --shadow-glow-cyan: 0 0 20px rgba(2, 132, 199, 0.12);
+  --shadow-glow-emerald: 0 0 20px rgba(5, 150, 105, 0.12);
+}
+
 /* Base Reset & Global Styles */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -849,3 +892,164 @@ table.data-table tr:hover td {
     display: none;
   }
 }
+
+/* ==========================================================================
+   Light Mode Theme Adjustments
+   ========================================================================== */
+[data-theme="light"] body::before {
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.05) 0%, transparent 60%),
+    radial-gradient(circle at 100% 50%, rgba(5, 150, 105, 0.04) 0%, transparent 50%),
+    linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+}
+
+[data-theme="light"] .sidebar {
+  background: rgba(255, 255, 255, 0.92);
+  border-right: 1px solid var(--border-subtle);
+}
+
+[data-theme="light"] .sidebar-header {
+  background: linear-gradient(180deg, rgba(241, 245, 249, 0.6) 0%, transparent 100%);
+}
+
+[data-theme="light"] .sidebar-footer {
+  background: rgba(248, 250, 252, 0.7);
+}
+
+[data-theme="light"] .nav-item:hover {
+  background: rgba(241, 245, 249, 0.85);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .nav-item.active {
+  background: linear-gradient(90deg, rgba(5, 150, 105, 0.12) 0%, rgba(2, 132, 199, 0.06) 100%);
+  color: var(--text-primary);
+  border-color: rgba(5, 150, 105, 0.35);
+}
+
+[data-theme="light"] .topbar {
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+[data-theme="light"] .hero-3d-card {
+  background: radial-gradient(circle at 50% 20%, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(5, 150, 105, 0.2);
+  box-shadow: var(--shadow-elevated);
+}
+
+[data-theme="light"] .hero-3d-header {
+  background: rgba(241, 245, 249, 0.6);
+}
+
+[data-theme="light"] .hero-3d-canvas-wrap {
+  background: radial-gradient(circle at 50% 50%, #edf2f7 0%, #f1f5f9 80%);
+}
+
+[data-theme="light"] .hero-3d-hud-pill {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-secondary);
+  border-color: var(--border-subtle);
+}
+
+[data-theme="light"] .hero-btn {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+
+[data-theme="light"] .hero-btn:hover {
+  background: #f1f5f9;
+  border-color: var(--accent-cyan);
+}
+
+[data-theme="light"] .hero-detail-drawer {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: var(--border-glass);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+}
+
+[data-theme="light"] .stat-card {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: var(--border-subtle);
+}
+
+[data-theme="light"] .glass-panel {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: var(--border-subtle);
+}
+
+[data-theme="light"] .chip {
+  background: rgba(241, 245, 249, 0.85);
+  border-color: var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .table-container {
+  background: rgba(248, 250, 252, 0.7);
+}
+
+[data-theme="light"] table.data-table th {
+  background: rgba(241, 245, 249, 0.95);
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] table.data-table td {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+[data-theme="light"] table.data-table tr:hover td {
+  background: rgba(241, 245, 249, 0.6);
+}
+
+[data-theme="light"] .btn-secondary {
+  background: rgba(241, 245, 249, 0.9);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+
+[data-theme="light"] .btn-secondary:hover {
+  background: #e2e8f0;
+  border-color: var(--accent-cyan);
+}
+
+[data-theme="light"] .input-control {
+  background: #ffffff;
+  border-color: var(--border-subtle);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .bar-track {
+  background: #e2e8f0;
+}
+
+/* Theme Toggle Button Style */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(17, 25, 35, 0.8);
+  border: 1px solid var(--border-subtle);
+  color: var(--accent-amber);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .theme-toggle-btn {
+  background: rgba(241, 245, 249, 0.95);
+  border-color: var(--border-subtle);
+  color: #d97706;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-cyan);
+  transform: translateY(-1px);
+}
+

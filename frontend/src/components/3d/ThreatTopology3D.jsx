@@ -25,7 +25,7 @@ const HUBS = [
   { id: 'UDP_HUB', label: 'UDP Core (10.23%)', pos: [1.5, -1.2, -0.8], color: '#34d399', radius: 0.18 }
 ];
 
-function HubNode({ hub }) {
+function HubNode({ hub, theme = 'dark' }) {
   return (
     <group position={hub.pos}>
       <mesh>
@@ -33,20 +33,21 @@ function HubNode({ hub }) {
         <meshStandardMaterial
           color={hub.color}
           emissive={hub.color}
-          emissiveIntensity={0.5}
+          emissiveIntensity={theme === 'light' ? 0.35 : 0.5}
           wireframe
         />
       </mesh>
       <Html distanceFactor={9} position={[0, hub.radius + 0.15, 0]} center>
         <div style={{
-          background: 'rgba(8, 11, 16, 0.85)',
+          background: theme === 'light' ? 'rgba(255, 255, 255, 0.92)' : 'rgba(8, 11, 16, 0.85)',
           border: `1px solid ${hub.color}`,
-          color: hub.color,
+          color: theme === 'light' ? '#0f172a' : hub.color,
           padding: '2px 6px',
           borderRadius: 4,
           fontSize: '10px',
           fontWeight: 'bold',
-          whiteSpace: 'nowrap'
+          whiteSpace: 'nowrap',
+          boxShadow: theme === 'light' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none'
         }}>
           {hub.label}
         </div>
@@ -55,7 +56,7 @@ function HubNode({ hub }) {
   );
 }
 
-function ThreatSphere({ node, isSelected, onSelect }) {
+function ThreatSphere({ node, isSelected, onSelect, theme = 'dark' }) {
   const [hovered, setHovered] = useState(false);
   const meshRef = useRef();
 
@@ -87,7 +88,7 @@ function ThreatSphere({ node, isSelected, onSelect }) {
         <meshStandardMaterial
           color={node.color}
           emissive={node.color}
-          emissiveIntensity={isSelected || hovered ? 0.7 : 0.25}
+          emissiveIntensity={isSelected || hovered ? (theme === 'light' ? 0.5 : 0.7) : 0.25}
           metalness={0.7}
           roughness={0.3}
         />
@@ -95,15 +96,20 @@ function ThreatSphere({ node, isSelected, onSelect }) {
 
       <Html distanceFactor={8} position={[0, node.r + 0.12, 0]} center>
         <div style={{
-          background: isSelected ? 'rgba(8, 11, 16, 0.95)' : 'rgba(12, 17, 24, 0.85)',
-          border: `1px solid ${isSelected ? node.color : 'rgba(148, 163, 184, 0.2)'}`,
-          color: '#f1f5f9',
+          background: isSelected 
+            ? (theme === 'light' ? '#ffffff' : 'rgba(8, 11, 16, 0.95)') 
+            : (theme === 'light' ? 'rgba(255, 255, 255, 0.92)' : 'rgba(12, 17, 24, 0.85)'),
+          border: `1px solid ${isSelected ? node.color : (theme === 'light' ? 'rgba(15, 23, 42, 0.15)' : 'rgba(148, 163, 184, 0.2)')}`,
+          color: theme === 'light' ? '#0f172a' : '#f1f5f9',
           padding: '2px 6px',
           borderRadius: 4,
           fontSize: '10px',
           fontFamily: 'monospace',
           whiteSpace: 'nowrap',
-          pointerEvents: 'none'
+          pointerEvents: 'none',
+          boxShadow: isSelected 
+            ? `0 2px 10px ${node.color}50` 
+            : (theme === 'light' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none')
         }}>
           {node.label}
         </div>
@@ -112,7 +118,7 @@ function ThreatSphere({ node, isSelected, onSelect }) {
   );
 }
 
-function ConnectionLine({ start, end, color }) {
+function ConnectionLine({ start, end, color, theme = 'dark' }) {
   const line = useMemo(() => {
     const points = [new THREE.Vector3(...start), new THREE.Vector3(...end)];
     return new THREE.BufferGeometry().setFromPoints(points);
@@ -120,12 +126,12 @@ function ConnectionLine({ start, end, color }) {
 
   return (
     <line geometry={line}>
-      <lineBasicMaterial color={color} transparent opacity={0.2} />
+      <lineBasicMaterial color={color} transparent opacity={theme === 'light' ? 0.35 : 0.2} />
     </line>
   );
 }
 
-export default function ThreatTopology3D({ selectedThreat, onSelectThreat }) {
+export default function ThreatTopology3D({ selectedThreat, onSelectThreat, theme = 'dark' }) {
   const [filterProto, setFilterProto] = useState('ALL');
   const controlsRef = useRef();
 
@@ -142,22 +148,22 @@ export default function ThreatTopology3D({ selectedThreat, onSelectThreat }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        background: 'rgba(8, 11, 16, 0.4)'
+        background: theme === 'light' ? 'rgba(241, 245, 249, 0.6)' : 'rgba(8, 11, 16, 0.4)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span className="hero-3d-badge">3D Threat Space</span>
-          <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#f1f5f9' }}>
+          <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
             Behavioral Constellation & Protocol Clustering
           </span>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Filter Transport:</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Filter Transport:</span>
           {['ALL', 'TCP', 'UDP'].map((p) => (
             <button
               key={p}
               onClick={() => setFilterProto(p)}
               style={{
-                background: filterProto === p ? 'var(--accent-cyan-subtle)' : 'rgba(17, 25, 35, 0.6)',
+                background: filterProto === p ? 'var(--accent-cyan-subtle)' : 'var(--bg-input)',
                 border: `1px solid ${filterProto === p ? 'var(--accent-cyan)' : 'var(--border-subtle)'}`,
                 color: filterProto === p ? 'var(--accent-cyan)' : 'var(--text-secondary)',
                 borderRadius: 4,
@@ -180,16 +186,22 @@ export default function ThreatTopology3D({ selectedThreat, onSelectThreat }) {
         </div>
       </div>
 
-      <div style={{ height: '360px', position: 'relative', background: 'radial-gradient(circle at 50% 50%, #0d1521 0%, #080b10 80%)' }}>
+      <div style={{ 
+        height: '360px', 
+        position: 'relative', 
+        background: theme === 'light' 
+          ? 'radial-gradient(circle at 50% 50%, #edf2f7 0%, #f1f5f9 80%)' 
+          : 'radial-gradient(circle at 50% 50%, #0d1521 0%, #080b10 80%)' 
+      }}>
         <Canvas camera={{ position: [0, 1.0, 5.2], fov: 45 }}>
-          <ambientLight intensity={0.4} />
-          <pointLight position={[8, 8, 8]} intensity={0.7} color="#22d3ee" />
-          <pointLight position={[-8, -8, -8]} intensity={0.4} color="#f43f5e" />
+          <ambientLight intensity={theme === 'light' ? 0.75 : 0.4} />
+          <pointLight position={[8, 8, 8]} intensity={theme === 'light' ? 0.9 : 0.7} color="#22d3ee" />
+          <pointLight position={[-8, -8, -8]} intensity={theme === 'light' ? 0.6 : 0.4} color="#f43f5e" />
 
           <Suspense fallback={null}>
             {/* Core Hubs */}
             {HUBS.map((hub) => (
-              <HubNode key={hub.id} hub={hub} />
+              <HubNode key={hub.id} hub={hub} theme={theme} />
             ))}
 
             {/* Connecting lines between hubs and nodes */}
@@ -201,6 +213,7 @@ export default function ThreatTopology3D({ selectedThreat, onSelectThreat }) {
                   start={[node.x, node.y, node.z]}
                   end={targetHub.pos}
                   color={node.color}
+                  theme={theme}
                 />
               );
             })}
@@ -212,6 +225,7 @@ export default function ThreatTopology3D({ selectedThreat, onSelectThreat }) {
                 node={node}
                 isSelected={selectedThreat?.id === node.id}
                 onSelect={(n) => onSelectThreat && onSelectThreat(n)}
+                theme={theme}
               />
             ))}
           </Suspense>
@@ -231,12 +245,12 @@ export default function ThreatTopology3D({ selectedThreat, onSelectThreat }) {
           position: 'absolute',
           bottom: 12,
           left: 16,
-          background: 'rgba(12, 17, 24, 0.85)',
+          background: theme === 'light' ? 'rgba(255, 255, 255, 0.92)' : 'rgba(12, 17, 24, 0.85)',
           padding: '6px 12px',
           borderRadius: 6,
           fontSize: '0.75rem',
-          color: '#94a3b8',
-          border: '1px solid var(--border-glass)',
+          color: 'var(--text-secondary)',
+          border: '1px solid var(--border-subtle)',
           pointerEvents: 'none'
         }}>
           Node radius correlates with class volume · Colors delineate attack families vs normal telemetry

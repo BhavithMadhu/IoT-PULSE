@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 import OverviewPage from './pages/OverviewPage';
@@ -24,27 +24,39 @@ const PAGE_TITLES = {
 export default function App() {
   const [activePage, setActivePage] = useState('overview');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('iot_pulse_theme') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('iot_pulse_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   const renderPage = () => {
     switch (activePage) {
       case 'overview':
-        return <OverviewPage />;
+        return <OverviewPage theme={theme} />;
       case 'attacks':
-        return <AttackIntelligencePage />;
+        return <AttackIntelligencePage theme={theme} />;
       case 'eda':
-        return <EdaPage />;
+        return <EdaPage theme={theme} />;
       case 'statistics':
-        return <StatisticalInvestigationPage />;
+        return <StatisticalInvestigationPage theme={theme} />;
       case 'hypotheses':
-        return <HypothesisTestingPage />;
+        return <HypothesisTestingPage theme={theme} />;
       case 'model':
-        return <MachineLearningPage />;
+        return <MachineLearningPage theme={theme} />;
       case 'explorer':
-        return <DataExplorerPage />;
+        return <DataExplorerPage theme={theme} />;
       case 'methodology':
-        return <MethodologyPage />;
+        return <MethodologyPage theme={theme} />;
       default:
-        return <OverviewPage />;
+        return <OverviewPage theme={theme} />;
     }
   };
 
@@ -55,11 +67,15 @@ export default function App() {
         setActivePage={setActivePage} 
         mobileOpen={mobileOpen}
         onCloseMobile={() => setMobileOpen(false)}
+        theme={theme}
+        toggleTheme={toggleTheme}
       />
       <div className="main-content">
         <Topbar 
           activeTitle={PAGE_TITLES[activePage] || 'IoT PULSE Analytics'} 
           onOpenMobile={() => setMobileOpen(true)}
+          theme={theme}
+          toggleTheme={toggleTheme}
         />
         <main>
           {renderPage()}

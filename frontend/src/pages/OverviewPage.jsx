@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import NetworkGlobeHero from '../components/3d/NetworkGlobeHero';
 
-export default function OverviewPage() {
+export default function OverviewPage({ theme }) {
   const [overview, setOverview] = useState(null);
   const [attacks, setAttacks] = useState(null);
   const [protocols, setProtocols] = useState(null);
@@ -83,7 +83,7 @@ export default function OverviewPage() {
       </div>
 
       {/* Signature 3D Network Globe Hero */}
-      <NetworkGlobeHero overviewData={overview} />
+      <NetworkGlobeHero overviewData={overview} theme={theme} />
 
       {/* KPI Cards Ribbon */}
       <div className="stats-grid">

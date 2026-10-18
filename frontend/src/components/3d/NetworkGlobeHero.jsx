@@ -115,7 +115,7 @@ const DATASET_NODES = [
 ];
 
 // Inner Spherical Wireframe Lattice
-function GlobeLattice() {
+function GlobeLattice({ theme = 'dark' }) {
   const meshRef = useRef();
 
   useFrame((_, delta) => {
@@ -125,33 +125,37 @@ function GlobeLattice() {
     }
   });
 
+  const wireColor = theme === 'light' ? '#0284c7' : '#22d3ee';
+  const ring1Color = theme === 'light' ? '#059669' : '#34d399';
+  const ring2Color = theme === 'light' ? '#0284c7' : '#22d3ee';
+
   return (
     <group ref={meshRef}>
       {/* Primary geodetic wireframe */}
       <mesh>
         <sphereGeometry args={[2.0, 24, 24]} />
         <meshBasicMaterial
-          color="#22d3ee"
+          color={wireColor}
           wireframe
           transparent
-          opacity={0.12}
+          opacity={theme === 'light' ? 0.22 : 0.12}
         />
       </mesh>
-      {/* Secondary inner ring */}
+      {/* Secondary inner rings */}
       <mesh rotation={[Math.PI / 4, 0, 0]}>
         <ringGeometry args={[2.05, 2.08, 64]} />
-        <meshBasicMaterial color="#34d399" transparent opacity={0.18} side={THREE.DoubleSide} />
+        <meshBasicMaterial color={ring1Color} transparent opacity={theme === 'light' ? 0.3 : 0.18} side={THREE.DoubleSide} />
       </mesh>
       <mesh rotation={[-Math.PI / 4, 0, 0]}>
         <ringGeometry args={[2.15, 2.18, 64]} />
-        <meshBasicMaterial color="#22d3ee" transparent opacity={0.14} side={THREE.DoubleSide} />
+        <meshBasicMaterial color={ring2Color} transparent opacity={theme === 'light' ? 0.25 : 0.14} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
 }
 
 // Ambient Floating Telemetry Particles
-function FloatingParticles({ count = 120 }) {
+function FloatingParticles({ count = 120, theme = 'dark' }) {
   const points = useMemo(() => {
     const p = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
@@ -184,9 +188,9 @@ function FloatingParticles({ count = 120 }) {
       </bufferGeometry>
       <pointsMaterial
         size={0.035}
-        color="#22d3ee"
+        color={theme === 'light' ? '#0284c7' : '#22d3ee'}
         transparent
-        opacity={0.4}
+        opacity={theme === 'light' ? 0.6 : 0.4}
         sizeAttenuation
       />
     </points>
@@ -194,7 +198,7 @@ function FloatingParticles({ count = 120 }) {
 }
 
 // Interactive Network Cluster Node
-function InteractiveNode({ node, isSelected, onSelect }) {
+function InteractiveNode({ node, isSelected, onSelect, theme = 'dark' }) {
   const [hovered, setHovered] = useState(false);
   const meshRef = useRef();
 
@@ -227,7 +231,7 @@ function InteractiveNode({ node, isSelected, onSelect }) {
         <meshStandardMaterial
           color={node.color}
           emissive={node.color}
-          emissiveIntensity={isSelected || hovered ? 0.8 : 0.3}
+          emissiveIntensity={isSelected || hovered ? (theme === 'light' ? 0.5 : 0.8) : 0.25}
           roughness={0.2}
           metalness={0.8}
         />
@@ -244,16 +248,20 @@ function InteractiveNode({ node, isSelected, onSelect }) {
       {/* HTML Label on 3D Node */}
       <Html distanceFactor={8} position={[0, node.radius + 0.14, 0]} center>
         <div style={{
-          background: isSelected ? 'rgba(8, 11, 16, 0.95)' : 'rgba(12, 17, 24, 0.8)',
-          border: `1px solid ${isSelected ? node.color : 'rgba(148, 163, 184, 0.15)'}`,
+          background: isSelected 
+            ? (theme === 'light' ? '#ffffff' : 'rgba(8, 11, 16, 0.95)') 
+            : (theme === 'light' ? 'rgba(255, 255, 255, 0.92)' : 'rgba(12, 17, 24, 0.85)'),
+          border: `1px solid ${isSelected ? node.color : (theme === 'light' ? 'rgba(15, 23, 42, 0.15)' : 'rgba(148, 163, 184, 0.15)')}`,
           padding: '3px 8px',
           borderRadius: '4px',
           fontSize: '11px',
           fontFamily: 'monospace',
-          color: '#f1f5f9',
+          color: theme === 'light' ? '#0f172a' : '#f1f5f9',
           whiteSpace: 'nowrap',
           pointerEvents: 'none',
-          boxShadow: isSelected ? `0 0 12px ${node.color}40` : 'none',
+          boxShadow: isSelected 
+            ? `0 2px 12px ${node.color}50` 
+            : (theme === 'light' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none'),
           transition: 'all 0.2s ease'
         }}>
           {node.label} <span style={{ color: node.color, fontWeight: 'bold' }}>{node.percentage}%</span>
@@ -264,7 +272,7 @@ function InteractiveNode({ node, isSelected, onSelect }) {
 }
 
 // Spline Transmission Arc between Two Nodes
-function TransmissionArc({ start, end, color = '#22d3ee' }) {
+function TransmissionArc({ start, end, color = '#22d3ee', theme = 'dark' }) {
   const lineObj = useMemo(() => {
     const v1 = new THREE.Vector3(...start);
     const v2 = new THREE.Vector3(...end);
@@ -278,13 +286,13 @@ function TransmissionArc({ start, end, color = '#22d3ee' }) {
 
   return (
     <line geometry={lineObj}>
-      <lineBasicMaterial color={color} transparent opacity={0.25} />
+      <lineBasicMaterial color={color} transparent opacity={theme === 'light' ? 0.4 : 0.25} />
     </line>
   );
 }
 
 // Main Network Globe 3D Scene
-export default function NetworkGlobeHero({ overviewData }) {
+export default function NetworkGlobeHero({ overviewData, theme = 'dark' }) {
   const [selectedNode, setSelectedNode] = useState(DATASET_NODES[0]); // Default to DOS_SYN_Hping
   const [isRotating, setIsRotating] = useState(true);
   const [hasWebGL, setHasWebGL] = useState(true);
@@ -313,7 +321,7 @@ export default function NetworkGlobeHero({ overviewData }) {
         <div className="hero-3d-header">
           <div className="hero-3d-title-group">
             <span className="hero-3d-badge">2D Topology View</span>
-            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#f1f5f9' }}>
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
               RT-IOT2022 Network Interaction Model
             </span>
           </div>
@@ -331,12 +339,12 @@ export default function NetworkGlobeHero({ overviewData }) {
       <div className="hero-3d-header">
         <div className="hero-3d-title-group">
           <span className="hero-3d-badge">3D Network Intelligence</span>
-          <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#f1f5f9' }}>
+          <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
             Spatial Traffic Topology & Threat Clustering (123,117 Flows)
           </span>
         </div>
-        <div style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#34d399', display: 'inline-block' }} />
+        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-emerald)', display: 'inline-block' }} />
           Hardware Accelerated WebGL
         </div>
       </div>
@@ -348,19 +356,19 @@ export default function NetworkGlobeHero({ overviewData }) {
           dpr={[1, Math.min(window.devicePixelRatio, 2)]}
           gl={{ antialias: true, alpha: true }}
         >
-          <ambientLight intensity={0.4} />
-          <pointLight position={[10, 10, 10]} intensity={0.8} color="#22d3ee" />
-          <pointLight position={[-10, -10, -10]} intensity={0.4} color="#34d399" />
+          <ambientLight intensity={theme === 'light' ? 0.75 : 0.4} />
+          <pointLight position={[10, 10, 10]} intensity={theme === 'light' ? 1.0 : 0.8} color="#22d3ee" />
+          <pointLight position={[-10, -10, -10]} intensity={theme === 'light' ? 0.6 : 0.4} color="#34d399" />
 
           <Suspense fallback={null}>
-            <GlobeLattice />
-            <FloatingParticles count={140} />
+            <GlobeLattice theme={theme} />
+            <FloatingParticles count={140} theme={theme} />
 
             {/* Transmission Arcs */}
-            <TransmissionArc start={DATASET_NODES[0].pos} end={DATASET_NODES[1].pos} color="#34d399" />
-            <TransmissionArc start={DATASET_NODES[0].pos} end={DATASET_NODES[3].pos} color="#10b981" />
-            <TransmissionArc start={DATASET_NODES[2].pos} end={DATASET_NODES[0].pos} color="#f59e0b" />
-            <TransmissionArc start={DATASET_NODES[4].pos} end={DATASET_NODES[1].pos} color="#22d3ee" />
+            <TransmissionArc start={DATASET_NODES[0].pos} end={DATASET_NODES[1].pos} color="#34d399" theme={theme} />
+            <TransmissionArc start={DATASET_NODES[0].pos} end={DATASET_NODES[3].pos} color="#10b981" theme={theme} />
+            <TransmissionArc start={DATASET_NODES[2].pos} end={DATASET_NODES[0].pos} color="#f59e0b" theme={theme} />
+            <TransmissionArc start={DATASET_NODES[4].pos} end={DATASET_NODES[1].pos} color="#22d3ee" theme={theme} />
 
             {/* Dataset Nodes */}
             {DATASET_NODES.map((node) => (
@@ -369,6 +377,7 @@ export default function NetworkGlobeHero({ overviewData }) {
                 node={node}
                 isSelected={selectedNode?.id === node.id}
                 onSelect={(n) => setSelectedNode(n)}
+                theme={theme}
               />
             ))}
           </Suspense>
@@ -408,46 +417,46 @@ export default function NetworkGlobeHero({ overviewData }) {
                 <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: selectedNode.color, fontWeight: 700 }}>
                   {selectedNode.category}
                 </div>
-                <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f1f5f9' }}>
+                <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                   {selectedNode.label}
                 </div>
               </div>
               <button
                 onClick={() => setSelectedNode(null)}
-                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 2 }}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 2 }}
               >
                 <X size={16} />
               </button>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: 12 }}>
-              <div style={{ background: 'rgba(17, 25, 35, 0.7)', padding: '8px 10px', borderRadius: 6, border: '1px solid rgba(148, 163, 184, 0.08)' }}>
-                <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>FLOW COUNT</div>
-                <div style={{ fontSize: '1rem', fontWeight: 700, color: '#f1f5f9', fontFamily: 'monospace' }}>
+              <div style={{ background: 'var(--bg-input)', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>FLOW COUNT</div>
+                <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'monospace' }}>
                   {selectedNode.flows.toLocaleString()}
                 </div>
               </div>
-              <div style={{ background: 'rgba(17, 25, 35, 0.7)', padding: '8px 10px', borderRadius: 6, border: '1px solid rgba(148, 163, 184, 0.08)' }}>
-                <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>SHARE OF TRAFFIC</div>
+              <div style={{ background: 'var(--bg-input)', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>SHARE OF TRAFFIC</div>
                 <div style={{ fontSize: '1rem', fontWeight: 700, color: selectedNode.color, fontFamily: 'monospace' }}>
                   {selectedNode.percentage}%
                 </div>
               </div>
-              <div style={{ background: 'rgba(17, 25, 35, 0.7)', padding: '8px 10px', borderRadius: 6, border: '1px solid rgba(148, 163, 184, 0.08)' }}>
-                <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>TRANSPORT PROTO</div>
-                <div style={{ fontSize: '0.84rem', fontWeight: 600, color: '#f1f5f9' }}>
+              <div style={{ background: 'var(--bg-input)', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>TRANSPORT PROTO</div>
+                <div style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                   {selectedNode.proto}
                 </div>
               </div>
-              <div style={{ background: 'rgba(17, 25, 35, 0.7)', padding: '8px 10px', borderRadius: 6, border: '1px solid rgba(148, 163, 184, 0.08)' }}>
-                <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>MEDIAN DURATION</div>
-                <div style={{ fontSize: '0.84rem', fontWeight: 600, color: '#f1f5f9', fontFamily: 'monospace' }}>
+              <div style={{ background: 'var(--bg-input)', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>MEDIAN DURATION</div>
+                <div style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'monospace' }}>
                   {selectedNode.durationMedian}
                 </div>
               </div>
             </div>
 
-            <div style={{ fontSize: '0.78rem', color: '#cbd5e1', lineHeight: 1.5, background: 'rgba(8, 11, 16, 0.6)', padding: '8px 10px', borderRadius: 6, borderLeft: `3px solid ${selectedNode.color}` }}>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.5, background: 'var(--bg-input)', padding: '8px 10px', borderRadius: 6, borderLeft: `3px solid ${selectedNode.color}` }}>
               <strong>Empirical Insight:</strong> {selectedNode.insight}
             </div>
           </div>
@@ -456,7 +465,7 @@ export default function NetworkGlobeHero({ overviewData }) {
         {/* Ambient HUD Bar */}
         <div className="hero-3d-overlay">
           <div className="hero-3d-hud-pill">
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }} />
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-emerald)' }} />
             <span>Interactive 3D Spatial Topology — Click nodes to inspect behavioral telemetry</span>
           </div>
         </div>

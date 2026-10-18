@@ -85,11 +85,31 @@ export default function Sidebar({ activePage, setActivePage, mobileOpen, onClose
 
       {/* Status Footer */}
       <div className="sidebar-footer">
-        <div className="status-pill" style={{ marginBottom: 6 }}>
-          <span className="status-dot" />
-          <span style={{ fontWeight: 600, color: '#f1f5f9' }}>In-Memory DuckDB</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          <div className="status-pill">
+            <span className="status-dot" />
+            <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>DuckDB Active</span>
+          </div>
+          <button
+            onClick={toggleTheme}
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 6,
+              padding: '3px 8px',
+              fontSize: '0.72rem',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4
+            }}
+            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+          >
+            {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+          </button>
         </div>
-        <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontFamily: 'monospace' }}>
+        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
           RT-IOT2022 · 123,117 Flows
         </div>
       </div>
