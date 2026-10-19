@@ -136,10 +136,6 @@ export default function LandingPage({ theme = 'dark', toggleTheme }) {
           <div className="landing-hero-visual">
             <div className="hero-3d-frame">
               <HeroGlobe3D theme={theme} />
-              <div className="hero-frame-caption">
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-emerald)', display: 'inline-block' }} />
-                <span>Interactive 3D Spatial Network Model · Click & drag to inspect cluster geometry</span>
-              </div>
             </div>
           </div>
         </div>
