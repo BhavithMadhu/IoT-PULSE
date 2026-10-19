@@ -3,14 +3,16 @@ import { Link } from 'react-router-dom';
 import PublicNavbar from '../../components/public/PublicNavbar';
 import PublicFooter from '../../components/public/PublicFooter';
 import HeroGlobe3D from '../../components/3d/HeroGlobe3D';
+import PacketWarpEntrance from '../../components/entrance/PacketWarpEntrance';
 import { 
   ShieldAlert, ShieldCheck, ArrowRight, Activity, Database, 
   BarChart2, Cpu, CheckCircle2, ChevronRight, Layers, 
   Sparkles, Globe2, HelpCircle, FileText, ExternalLink,
-  Terminal, Server, PieChart, TrendingUp, Lock, RefreshCw, BookOpen
+  Terminal, Server, PieChart, TrendingUp, Lock, RefreshCw, BookOpen, Zap
 } from 'lucide-react';
 
 export default function LandingPage({ theme = 'dark', toggleTheme }) {
+  const [showWarp, setShowWarp] = useState(true);
   const [selectedResearchCat, setSelectedResearchCat] = useState('ALL');
 
   // Real verified research questions from the notebook
@@ -83,6 +85,11 @@ export default function LandingPage({ theme = 'dark', toggleTheme }) {
 
   return (
     <div className="public-page-wrapper">
+      {/* 3D Network Packet & Flow Warp Tunnel Entrance */}
+      {showWarp && (
+        <PacketWarpEntrance onEnter={() => setShowWarp(false)} />
+      )}
+
       <PublicNavbar theme={theme} toggleTheme={toggleTheme} />
 
       {/* =========================================================================
@@ -121,6 +128,15 @@ export default function LandingPage({ theme = 'dark', toggleTheme }) {
                 <HelpCircle size={16} />
                 <span>Discover the Research</span>
               </Link>
+
+              <button 
+                onClick={() => setShowWarp(true)} 
+                className="btn btn-secondary hero-warp-btn"
+                title="Launch 3D Network Packet Warp Tunnel Experience"
+              >
+                <Zap size={15} style={{ color: 'var(--accent-cyan)' }} />
+                <span>Warp Stream</span>
+              </button>
             </div>
 
             {/* Truthful Dataset Badge */}
