@@ -49,10 +49,10 @@ Internet of Things (IoT) ecosystems introduce heterogeneous protocols (MQTT, HTT
 
 ---
 
-## 3. macOS Quickstart & Installation
+## 3. Quickstart & Installation (macOS, Linux & Windows)
 
 ### Prerequisites
-* **Python 3.9+** (installed and available via `python3`)
+* **Python 3.9+** (installed and available via `python` or `python3`)
 * **Node.js 18+** & **npm** (installed and available via `node` and `npm`)
 
 ### 1. Install Backend Dependencies
@@ -68,15 +68,27 @@ npm --prefix frontend install
 ```
 
 ### 3. Launch Both Services Concurrently
-Use the provided startup script:
+
+#### Windows (PowerShell)
+```powershell
+.\start.ps1
+```
+
+#### Windows (Command Prompt / Double Click)
+```cmd
+start.bat
+```
+
+#### macOS / Linux (Bash)
 ```bash
 chmod +x start.sh
 ./start.sh
 ```
-Or run the services in separate terminal windows:
+
+Or run the services manually in separate terminal windows:
 * **Terminal 1 (Backend):**
   ```bash
-  python3 -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+  python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
   ```
 * **Terminal 2 (Frontend):**
   ```bash
@@ -90,7 +102,21 @@ Or run the services in separate terminal windows:
 
 ---
 
-## 4. API Endpoints Reference
+## 4. 3D Cyber Defense Holographic Engine
+
+IoT-PULSE features an interactive 3D spatial threat topology globe built with **Three.js** and **React Three Fiber**:
+
+* **Procedural Cyber Earth Topography (`globeTexture.js`):** Generates high-definition world continent silhouettes and illuminated cyber dot-matrix landmasses completely offline using HTML5 Canvas.
+* **Vertical Light Beacons & Shockwaves:** Nodes project vertical holographic laser pillars scaled to traffic volume (with the 94k DOS SYN flood rising as the dominant epicenter) surrounded by expanding ground ripple rings.
+* **Streaming Photon Energy Arcs:** Dynamic 3D quadratic Bezier arcs with real-time moving photon packets that stream between threat sources and legitimate IoT telemetry cloud gateways.
+* **Gyroscopic Defense Gimbal:** Dual-axis tactical rings and an orbiting sentinel recon satellite.
+* **Glassmorphic Telemetry Cockpit HUD:** Real-time threat classification tags, category filter buttons (`All`, `Threats`, `Normal`), and simulated volumetric attack surge mode.
+
+---
+
+---
+
+## 5. API Endpoints Reference
 
 The backend provides documented, typed, and validated REST endpoints under `/api`:
 
@@ -115,7 +141,7 @@ The backend provides documented, typed, and validated REST endpoints under `/api
 
 ---
 
-## 5. Summary of All 15 Research Questions
+## 6. Summary of All 15 Research Questions
 
 All 15 questions from `IoT_PULSE_RT_IOT2022_FINAL_Case_Study.ipynb` are preserved and computed from actual data:
 
@@ -139,7 +165,7 @@ All 15 questions from `IoT_PULSE_RT_IOT2022_FINAL_Case_Study.ipynb` are preserve
 
 ---
 
-## 6. Power BI Desktop Integration
+## 7. Power BI Desktop Integration
 
 The `powerbi/` and `exports/` directories provide a complete Power BI implementation:
 
@@ -156,12 +182,12 @@ The `powerbi/` and `exports/` directories provide a complete Power BI implementa
 
 ---
 
-## 7. Automated Testing & Validation
+## 8. Automated Testing & Validation
 
 The project includes an automated test suite verifying endpoint schemas, analytical parity with the Jupyter notebook, and data integrity:
 
 ```bash
-python3 -m pytest backend/tests -v
+python -m pytest backend/tests -v
 ```
 
 ### Verified Test Results (17/17 Passed)
@@ -173,7 +199,7 @@ python3 -m pytest backend/tests -v
 
 ---
 
-## 8. Academic Rigor & Ethical Boundaries
+## 9. Academic Rigor & Ethical Boundaries
 
 > [!IMPORTANT]
 > **Observational Two-Group Comparisons vs Randomized A/B Testing:**
@@ -181,13 +207,15 @@ python3 -m pytest backend/tests -v
 
 ---
 
-## 9. Project Deliverables Structure
+## 10. Project Deliverables Structure
 
 ```text
-fods/
+IoT-PULSE/
 ├── RT_IOT2022.csv                              # Source dataset (123,117 flows × 85 cols)
 ├── IoT_PULSE_RT_IOT2022_FINAL_Case_Study.ipynb # Original verified Jupyter notebook
-├── start.sh                                    # Single executable dev startup script
+├── start.sh                                    # Bash dev server launcher (macOS/Linux)
+├── start.ps1                                   # PowerShell launcher with health polling (Windows)
+├── start.bat                                   # Double-click cmd launcher (Windows)
 ├── .env.example                                # Environment variable template
 ├── .gitignore                                  # Git exclusion configuration
 ├── README.md                                   # Master project documentation
