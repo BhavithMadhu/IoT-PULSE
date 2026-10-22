@@ -89,11 +89,42 @@ app.include_router(model.router, prefix=settings.API_PREFIX)
 app.include_router(explorer.router, prefix=settings.API_PREFIX)
 app.include_router(export.router, prefix=settings.API_PREFIX)
 
-@app.get("/")
-def root():
-    return {
-        "project": "IoT PULSE — Cybersecurity Analytics Platform",
-        "documentation": "/docs",
-        "api_health": f"{settings.API_PREFIX}/health",
-        "version": settings.PROJECT_VERSION
-    }
+# Mount frontend SPA if dist exists (enables all-in-one single-container deployment)
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+dist_candidates = [
+    Path(__file__).resolve().parent.parent.parent / "frontend" / "dist",
+    Path("/app/frontend/dist"),
+    Path("frontend/dist")
+]
+frontend_dist = next((p for p in dist_candidates if p.exists() and (p / "index.html").exists()), None)
+
+if frontend_dist:
+    assets_dir = frontend_dist / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+
+    @app.get("/")
+    async def serve_root():
+        return FileResponse(frontend_dist / "index.html")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        if full_path.startswith("api/") or full_path.startswith("docs") or full_path.startswith("redoc") or full_path.startswith("openapi.json"):
+            return JSONResponse(status_code=404, content={"detail": "Not found"})
+        file_path = frontend_dist / full_path
+        if file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(frontend_dist / "index.html")
+else:
+    @app.get("/")
+    def root():
+        return {
+            "project": "IoT PULSE — Cybersecurity Analytics Platform",
+            "documentation": "/docs",
+            "api_health": f"{settings.API_PREFIX}/health",
+            "version": settings.PROJECT_VERSION
+        }
+
